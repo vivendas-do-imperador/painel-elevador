@@ -226,12 +226,23 @@ function mostrarAviso(item){
 function proximoAvisoComDelay(d){clearTimeout(avisoTimer);avisoTimer=setTimeout(proximoAviso,d);}
 function proximoAviso(){if(!avisos.length)return;avisoIdx=(avisoIdx+1)%avisos.length;mostrarAviso(avisos[avisoIdx]);}
 
+const AVISOS_EX=[
+  {titulo:'Bem-vindo ao Painel',texto:'As informações do condomínio serão exibidas aqui em breve.',icone:'👋',tag:'Aviso do Condomínio'},
+  {titulo:'Horário de Silêncio',texto:'Das 22h às 08h pedimos silêncio total. Respeite os vizinhos.',icone:'🌙',tag:'Normas de Convivência'},
+];
+const FRASES_EX=[
+  {frase:'A comunidade é onde a solidariedade se transforma em vizinhança.',autor:''},
+  {frase:'Um lar não é apenas um lugar; é um sentimento de pertencimento.',autor:''},
+];
+const TICKER_EX=['Portaria: atendimento 24 horas','Administração: seg a sex, das 09h às 18h','Em caso de emergência: ligue para a portaria'];
+
 async function carregarAvisos(){
   const a=await fetchCSV(CSV.AVISOS);
   const r=await fetchCSV(CSV.REGRAS);
   const lista=[];
-  a.filter(x=>x[0]&&x[3]!=='NÃO'&&!x[0].startsWith('⚙️')).forEach(x=>lista.push({titulo:x[0],texto:x[1]||'',icone:x[2]||'📢',tag:'Aviso do Condomínio'}));
-  r.filter(x=>x[0]&&x[3]!=='NÃO'&&!x[0].startsWith('⚙️')).forEach(x=>lista.push({titulo:x[0],texto:x[1]||'',icone:x[2]||'📜',tag:'Normas de Convivência'}));
+  if(a.length) a.filter(x=>x[0]&&x[3]!=='NÃO'&&!x[0].startsWith('⚙️')).forEach(x=>lista.push({titulo:x[0],texto:x[1]||'',icone:x[2]||'📢',tag:'Aviso do Condomínio'}));
+  if(r.length) r.filter(x=>x[0]&&x[3]!=='NÃO'&&!x[0].startsWith('⚙️')).forEach(x=>lista.push({titulo:x[0],texto:x[1]||'',icone:x[2]||'📜',tag:'Normas de Convivência'}));
+  if(!lista.length) AVISOS_EX.forEach(x=>lista.push(x));
   lista.push({titulo:'ELS Grid',texto:'Tecnologia  ·  Informes  ·  Produções\n\n💬  (21) 97269-0650  — Somente mensagens\n✉️  elsgrid@gmail.com',icone:'🏢',tag:'Desenvolvedor deste Painel'});
   CFG.MIDIAS.forEach(url=>lista.push({midia:url}));
   avisos=lista;
@@ -244,15 +255,16 @@ function proximaFrase(){if(!frases.length)return;fraseIdx=(fraseIdx+1)%frases.le
 
 async function carregarFrases(){
   const rows=await fetchCSV(CSV.FRASES);
-  frases=rows.filter(x=>x[0]&&x[2]!=='NÃO').map(x=>({frase:x[0],autor:x[1]||''}));
+  const lista=rows.filter(x=>x[0]&&x[2]!=='NÃO').map(x=>({frase:x[0],autor:x[1]||''}));
+  frases=lista.length?lista:FRASES_EX;
   if(frases.length)mostrarFrase(frases[0]);
   setInterval(proximaFrase,CFG.TEMPO_FRASE);
 }
 
 async function carregarTicker(){
   const rows=await fetchCSV(CSV.TICKER);
-  const itens=rows.filter(x=>x[0]&&x[1]!=='NÃO').map(x=>x[0]);
-  if(!itens.length)return;
+  const lista=rows.filter(x=>x[0]&&x[1]!=='NÃO').map(x=>x[0]);
+  const itens=lista.length?lista:TICKER_EX;
   const dup=[...itens,...itens];
   document.getElementById('ticker-content').innerHTML=dup.map(t=>'<span>'+t+'</span>').join('');
 }
@@ -292,6 +304,16 @@ async function init(){
   ld.style.opacity='0';
   setTimeout(()=>ld.style.display='none',1000);
 }
+
+// Fallback: se loading ainda visível após 10s, força saída
+setTimeout(()=>{
+  const ld=document.getElementById('loading');
+  if(ld && ld.style.display!=='none'){
+    ld.style.opacity='0';
+    setTimeout(()=>ld.style.display='none',500);
+  }
+},10000);
+
 window.addEventListener('load',init);
 <\/script>
 </body>
