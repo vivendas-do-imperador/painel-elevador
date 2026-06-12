@@ -25,11 +25,17 @@
 }
 
 html, body {
-  width: 1920px; height: 1080px;
+  width: 100vw; height: 100vh;
   overflow: hidden;
-  background: var(--az1);
+  background: #000;
   font-family: 'Inter', sans-serif;
   color: var(--br);
+}
+
+#scale-wrap {
+  width: 1920px; height: 1080px;
+  transform-origin: top left;
+  position: absolute; top: 0; left: 0;
 }
 
 /* ══════════════════════════════════════════════
@@ -390,6 +396,7 @@ html, body {
 </head>
 <body>
 
+<div id="scale-wrap">
 <div id="bg"></div>
 
 <!-- LOADING -->
@@ -746,5 +753,22 @@ async function init() {
 
 window.addEventListener('load', init);
 </script>
+</div><!-- /scale-wrap -->
+
+<script>
+function ajustarEscala() {
+  const wrap = document.getElementById('scale-wrap');
+  if (!wrap) return;
+  const scaleX = window.innerWidth  / 1920;
+  const scaleY = window.innerHeight / 1080;
+  const scale  = Math.min(scaleX, scaleY);
+  const offX = (window.innerWidth  - 1920 * scale) / 2;
+  const offY = (window.innerHeight - 1080 * scale) / 2;
+  wrap.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
+}
+ajustarEscala();
+window.addEventListener('resize', ajustarEscala);
+</script>
+
 </body>
 </html>
