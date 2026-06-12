@@ -27,6 +27,7 @@
 html, body {
   width: 100vw; height: 100vh;
   overflow: hidden;
+  margin: 0; padding: 0;
   background: #000;
   font-family: 'Inter', sans-serif;
   color: var(--br);
@@ -761,7 +762,7 @@ function ajustarEscala() {
   if (!wrap) return;
   const scaleX = window.innerWidth  / 1920;
   const scaleY = window.innerHeight / 1080;
-  const scale  = Math.min(scaleX, scaleY);
+  const scale  = Math.max(scaleX, scaleY); // cover: preenche tudo
   const offX = (window.innerWidth  - 1920 * scale) / 2;
   const offY = (window.innerHeight - 1080 * scale) / 2;
   wrap.style.transform = `translate(${offX}px, ${offY}px) scale(${scale})`;
