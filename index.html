@@ -305,16 +305,18 @@ async function init(){
   setTimeout(()=>ld.style.display='none',1000);
 }
 
-// Fallback: se loading ainda visível após 10s, força saída
+// Fallback: se loading ainda visível após 8s, força saída
 setTimeout(()=>{
   const ld=document.getElementById('loading');
-  if(ld && ld.style.display!=='none'){
-    ld.style.opacity='0';
-    setTimeout(()=>ld.style.display='none',500);
-  }
-},10000);
+  if(ld){ld.style.opacity='0';setTimeout(()=>{ld.style.display='none';},500);}
+},8000);
 
-window.addEventListener('load',init);
+// Iniciar assim que possível
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 <\/script>
 </body>
 </html>
