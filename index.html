@@ -269,14 +269,30 @@ async function carregarTicker(){
   document.getElementById('ticker-content').innerHTML=dup.map(t=>'<span>'+t+'</span>').join('');
 }
 
+function isYoutube(url){
+  return /youtube\.com|youtu\.be/.test(url);
+}
+
 function tocarVideo(url){
+  if(isYoutube(url)){
+    // YouTube — abre no app externo via window.open
+    window.open(url,'_blank');
+    return;
+  }
+  // Drive ou MP4 direto — toca no painel com áudio
   const ov=document.getElementById('video-overlay');
   const vp=document.getElementById('video-player');
+  // Converter link do Google Drive para link direto de download se necessário
+  const match = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if(match){
+    url = 'https://drive.google.com/uc?export=download&id=' + match[1];
+  }
   vp.src=url; vp.muted=false;
   ov.style.display='block';
   vp.play().catch(()=>{vp.muted=true;vp.play();});
   vp.onended=fecharVideo;
 }
+
 function fecharVideo(){
   const ov=document.getElementById('video-overlay');
   const vp=document.getElementById('video-player');
