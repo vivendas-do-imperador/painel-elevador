@@ -29,7 +29,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #corpo{display:flex;height:calc(1080px - 110px - 60px)}
 
 /* ESQUERDA */
-#painel-esq{width:820px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(201,168,76,0.25);position:relative;overflow:hidden}
+#painel-esq{width:70%;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(201,168,76,0.25);position:relative;overflow:hidden}
 #aviso-area{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 55px;position:relative}
 #aviso-area::before{content:'';position:absolute;top:0;left:40px;right:40px;height:2px;background:linear-gradient(90deg,transparent,var(--ou),transparent)}
 #aviso-icone{font-size:68px;margin-bottom:12px;line-height:1}
@@ -55,13 +55,13 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #clima-info p{font-size:16px;color:rgba(240,234,216,0.55);margin-top:4px}
 
 /* MERCADO */
-#mercado-box{padding:14px 36px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.1);flex-shrink:0}
-#mercado-tag{font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--ou);margin-bottom:10px}
-#mercado-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.mercado-item{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:6px;padding:10px 12px;text-align:center}
-.mercado-nome{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ou);margin-bottom:4px}
-.mercado-valor{font-family:'Playfair Display',serif;font-size:22px;color:var(--br);line-height:1}
-.mercado-var{font-size:12px;font-weight:600;margin-top:3px}
+#mercado-box{padding:10px 28px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.1);flex-shrink:0}
+#mercado-tag{font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--ou);margin-bottom:7px}
+#mercado-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mercado-item{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:5px;padding:7px 8px;text-align:center}
+.mercado-nome{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ou);margin-bottom:3px}
+.mercado-valor{font-family:'Playfair Display',serif;font-size:16px;color:var(--br);line-height:1}
+.mercado-var{font-size:10px;font-weight:600;margin-top:2px}
 .mercado-var.up{color:var(--verde)}
 .mercado-var.down{color:var(--vermelho)}
 .mercado-var.neu{color:var(--cinza)}
@@ -95,7 +95,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #feriado-badge{display:none;position:absolute;top:12px;right:12px;background:rgba(201,168,76,0.15);border:1px solid var(--ou);border-radius:6px;padding:6px 14px;font-size:13px;color:var(--ou);font-weight:600;letter-spacing:1px;z-index:5}
 
 /* VIDEO */
-#video-overlay{display:none;position:absolute;top:110px;left:0;width:820px;bottom:60px;z-index:50;background:#000}
+#video-overlay{display:none;position:absolute;top:110px;left:0;width:70%;bottom:60px;z-index:50;background:#000}
 #video-overlay video{width:100%;height:100%;object-fit:contain}
 #video-fechar{position:absolute;top:12px;right:12px;background:rgba(201,168,76,0.8);border:none;color:#000;font-size:20px;font-weight:700;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:51}
 
