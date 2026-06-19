@@ -428,26 +428,50 @@ const FEEDS = [
   {nome:'CNN BR', url:'https://www.cnnbrasil.com.br/feed/'},
 ];
 
+const PROXIES_NEWS = [
+  u => 'https://api.allorigins.win/get?url='+encodeURIComponent(u),
+  u => 'https://corsproxy.io/?'+encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u),
+];
+
+const NOTICIAS_FALLBACK = [
+  {fonte:'AVISO', titulo:'Consulte os comunicados do condomínio no painel de avisos ao lado.'},
+  {fonte:'AVISO', titulo:'Reunião de moradores: fique atento às datas divulgadas pela administração.'},
+  {fonte:'DICA',  titulo:'Em caso de emergência, acione a portaria imediatamente.'},
+  {fonte:'DICA',  titulo:'Mantenha as áreas comuns limpas e organizadas para todos.'},
+  {fonte:'INFO',  titulo:'Painel atualizado automaticamente. Notícias voltam em breve.'},
+];
+
+function parsearRSS(text){
+  let xmlText = text;
+  try{ const j = JSON.parse(text); if(j.contents) xmlText = j.contents; }catch(e){}
+  const xml = new DOMParser().parseFromString(xmlText, 'text/xml');
+  const items = xml.querySelectorAll('item');
+  const result = [];
+  items.forEach(item=>{
+    const title = item.querySelector('title');
+    if(title && title.textContent){
+      let t = title.textContent.trim().replace(/<!\[CDATA\[|\]\]>/g,'').trim();
+      if(t && t.length > 5) result.push(t);
+    }
+  });
+  return result.slice(0,3);
+}
+
 async function fetchRSS(feedUrl){
-  const proxy = 'https://api.allorigins.win/get?url='+encodeURIComponent(feedUrl);
-  try{
-    const r = await fetch(proxy);
-    const d = await r.json();
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(d.contents, 'text/xml');
-    const items = xml.querySelectorAll('item');
-    const result = [];
-    items.forEach(item=>{
-      const title = item.querySelector('title');
-      if(title && title.textContent){
-        let t = title.textContent.trim();
-        // Remove CDATA artifacts
-        t = t.replace(/<!\[CDATA\[|\]\]>/g,'').trim();
-        if(t && t.length > 5) result.push(t);
-      }
-    });
-    return result.slice(0,3);
-  }catch(e){ return []; }
+  for(const makeProxy of PROXIES_NEWS){
+    try{
+      const ctrl = new AbortController();
+      const tid = setTimeout(()=>ctrl.abort(), 6000);
+      const r = await fetch(makeProxy(feedUrl), {signal: ctrl.signal});
+      clearTimeout(tid);
+      if(!r.ok) continue;
+      const text = await r.text();
+      const titulos = parsearRSS(text);
+      if(titulos.length > 0) return titulos;
+    }catch(e){ continue; }
+  }
+  return [];
 }
 
 let noticiaIdx = 0;
@@ -471,14 +495,17 @@ function mostrarNoticias(lista){
 
 async function carregarNoticias(){
   const lista = [];
-  // Busca feeds em paralelo
   const resultados = await Promise.allSettled(
     FEEDS.map(f => fetchRSS(f.url).then(titulos => titulos.map(t=>({fonte:f.nome, titulo:t}))))
   );
   resultados.forEach(res=>{
     if(res.status==='fulfilled') res.value.forEach(item=>lista.push(item));
   });
-  // Embaralha e pega as primeiras N
+  if(!lista.length){
+    todasNoticias = NOTICIAS_FALLBACK;
+    mostrarNoticias(NOTICIAS_FALLBACK);
+    return;
+  }
   for(let i=lista.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [lista[i],lista[j]]=[lista[j],lista[i]];
