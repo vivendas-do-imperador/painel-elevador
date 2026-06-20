@@ -70,20 +70,20 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 .mercado-var.neu{color:var(--cinza)}
 
 /* NOTICIAS */
-#noticias-box{flex:1;padding:1.5vh 2.5vw 1vh;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.12);display:flex;flex-direction:column;position:relative;overflow:hidden}
-#noticias-box::before{content:'';position:absolute;top:0;left:1.5vw;right:1.5vw;height:1px;background:linear-gradient(90deg,transparent,var(--ou),transparent)}
+#noticias-box{flex:1;padding:1.8vh 1.5vw 1vh;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.12);display:flex;flex-direction:column;position:relative;overflow:hidden}
+#noticias-box::before{content:'';position:absolute;top:0;left:1vw;right:1vw;height:1px;background:linear-gradient(90deg,transparent,var(--ou),transparent)}
 #noticias-tag{font-size:1vw;font-weight:600;letter-spacing:0.3vw;text-transform:uppercase;color:var(--ou);margin-bottom:0.8vh;flex-shrink:0}
 #noticias-lista-multi{flex:1;display:flex;flex-direction:column;gap:0.6vh;overflow:hidden}
-.n-item{display:flex;align-items:center;gap:1vw;padding:0.8vh 1vw;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.18);border-radius:6px;flex:1;overflow:hidden}
-.n-logo{flex-shrink:0;width:5vw;height:3vh;object-fit:contain;border-radius:3px}
-.n-titulo{font-family:'Arial',sans-serif;font-size:1.7vw;color:var(--br);line-height:1.3;font-weight:700;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-#noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--ou),var(--oul));box-shadow:0 0 6px var(--ou);transition:width linear;flex-shrink:0;margin-top:0.5vh}
+.n-item{display:flex;align-items:center;gap:1.2vw;padding:0.8vh 1.2vw;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.18);border-radius:6px;flex:1;overflow:hidden;width:100%}
+.n-logo{flex-shrink:0;width:5.5vw;height:3.5vh;object-fit:contain;border-radius:3px}
+.n-titulo{font-family:'Arial',sans-serif;font-size:1.75vw;color:var(--br);line-height:1.35;font-weight:700;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+#noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--ou),var(--oul));box-shadow:0 0 6px var(--ou);transition:width linear;flex-shrink:0;margin-top:0.6vh}
 
 /* FRASE */
-#frase-box{flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:1.5vh 2.5vw;position:relative;overflow:hidden}
-#frase-aspas{font-family:'Playfair Display',serif;font-size:5vw;color:var(--ou);line-height:0.5;display:block;margin-bottom:0.5vh;opacity:0.5}
-#frase-texto{font-family:'Playfair Display',serif;font-size:1.6vw;font-style:italic;line-height:1.5;color:var(--br)}
-#frase-autor{font-size:1vw;color:var(--ou);letter-spacing:0.2vw;text-transform:uppercase;margin-top:0.8vh}
+#frase-box{flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:2vh 3vw;position:relative;overflow:hidden}
+#frase-aspas{font-family:'Playfair Display',serif;font-size:4vw;color:var(--ou);line-height:0.5;display:block;margin-bottom:0.8vh;opacity:0.5}
+#frase-texto{font-family:'Playfair Display',serif;font-size:1.9vw;font-style:italic;line-height:1.5;color:var(--br)}
+#frase-autor{font-size:1.1vw;color:var(--ou);letter-spacing:0.2vw;text-transform:uppercase;margin-top:0.8vh}
 
 /* TICKER */
 #ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
@@ -610,7 +610,7 @@ async function carregarAvisos(){
   if(a.length) a.filter(x=>x[0]&&x[3]!=='NÃO'&&!x[0].startsWith('⚙️')).forEach(x=>lista.push({titulo:x[0],texto:x[1]||'',icone:x[2]||'📢',tag:'Aviso do Condomínio'}));
   if(r.length) r.filter(x=>x[0]&&x[3]!=='NÃO'&&!x[0].startsWith('⚙️')).forEach(x=>lista.push({titulo:x[0],texto:x[1]||'',icone:x[2]||'📜',tag:'Normas de Convivência'}));
   if(!lista.length) AVISOS_EX.forEach(x=>lista.push(x));
-  lista.push({titulo:'ELS Grid',texto:'Tecnologia  ·  Informes  ·  Produções\n\n💬  (21) 97269-0650  — Somente mensagens\n✉️  elsgrid@gmail.com',icone:'🏢',tag:'Desenvolvedor deste Painel'});
+  lista.push({titulo:'ELS Grid',texto:'Tecnologia  ·  Informes  ·  Produções\n\n📱  (21) 99579-7058  — WhatsApp\n✉️  elsgrid@gmail.com',icone:'🏢',tag:'Desenvolvedor deste Painel'});
   CFG.MIDIAS.forEach(url=>lista.push({midia:url}));
   avisos = lista;
   if(avisos.length) mostrarAviso(avisos[0]);
