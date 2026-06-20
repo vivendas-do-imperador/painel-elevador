@@ -16,7 +16,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #scale-wrap{width:100vw;height:100vh;position:absolute;top:0;left:0;background:linear-gradient(160deg,#060e18 0%,#0d1b2a 50%,#111f30 100%);display:flex;flex-direction:column}
 
 /* HEADER */
-#header{height:11vh;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-bottom:2px solid var(--ou);position:relative;z-index:10;flex-shrink:0}
+#header{height:13vh;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-bottom:2px solid var(--ou);position:relative;z-index:10;flex-shrink:0}
 #logo-wrap img{height:9vh;object-fit:contain}
 #header-center{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
 #header-center h1{font-family:'Playfair Display',serif;font-size:3.2vw;font-weight:700;color:var(--oul);letter-spacing:0.4vw;text-transform:uppercase;white-space:nowrap}
@@ -30,7 +30,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #corpo{display:flex;flex:1;overflow:hidden}
 
 /* ESQUERDA */
-#painel-esq{width:60%;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(201,168,76,0.25);position:relative;overflow:hidden}
+#painel-esq{width:55%;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(201,168,76,0.25);position:relative;overflow:hidden}
 #aviso-area{flex:1;display:flex;flex-direction:column;justify-content:center;padding:3vh 4vw;position:relative}
 #aviso-area::before{content:'';position:absolute;top:0;left:2.5vw;right:2.5vw;height:2px;background:linear-gradient(90deg,transparent,var(--ou),transparent)}
 #aviso-icone{font-size:5vh;margin-bottom:1vh;line-height:1}
@@ -87,7 +87,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw}
 #ticker-scroll-wrap{flex:1;overflow:hidden;height:100%}
-#ticker-content{display:flex;align-items:center;height:100%;white-space:nowrap;animation:ticker 45s linear infinite}
+#ticker-content{display:flex;align-items:center;height:100%;white-space:nowrap;animation:ticker 28s linear infinite}
 #ticker-content span{font-size:1.6vw;color:rgba(240,234,216,0.95);padding:0 3vw;font-weight:400}
 #ticker-content span::after{content:' ✶ ';color:var(--ou);opacity:0.9}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
@@ -96,7 +96,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #feriado-badge{display:none;position:absolute;top:1vh;right:1.5vw;background:rgba(201,168,76,0.15);border:1px solid var(--ou);border-radius:6px;padding:0.5vh 1vw;font-size:1vw;color:var(--ou);font-weight:600;letter-spacing:0.1vw;z-index:5}
 
 /* VIDEO */
-#video-overlay{display:none;position:absolute;top:11vh;left:0;width:60%;bottom:6vh;z-index:50;background:#000}
+#video-overlay{display:none;position:absolute;top:13vh;left:0;width:55%;bottom:6vh;z-index:50;background:#000}
 #video-overlay video{width:100%;height:100%;object-fit:contain}
 #video-fechar{position:absolute;top:1vh;right:1vw;background:rgba(201,168,76,0.8);border:none;color:#000;font-size:2vh;font-weight:700;width:4vh;height:4vh;border-radius:50%;cursor:pointer;z-index:51}
 
