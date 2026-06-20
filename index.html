@@ -103,7 +103,8 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #video-overlay video{width:100%;height:100%;object-fit:contain}
 #video-fechar{position:absolute;top:1vh;right:1vw;background:rgba(201,168,76,0.8);border:none;color:#000;font-size:2vh;font-weight:700;width:4vh;height:4vh;border-radius:50%;cursor:pointer;z-index:51}
 
-/* LOADING */
+/* RELOAD STATUS */
+#reload-status{position:fixed;bottom:6.5vh;right:0.5vw;font-size:0.7vw;color:rgba(201,168,76,0.4);font-family:'Inter',sans-serif;z-index:999;text-align:right;pointer-events:none;transition:color 1s}
 #loading{position:fixed;inset:0;z-index:999;background:var(--az0);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease}
 #loading p{font-size:1vw;color:var(--ou);letter-spacing:0.4vw;text-transform:uppercase}
 .spinner{width:44px;height:44px;margin-top:2vh;border:2px solid rgba(201,168,76,0.15);border-top-color:var(--ou);border-radius:50%;animation:spin 1s linear infinite}
@@ -111,6 +112,8 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 </style>
 </head>
 <body>
+
+<div id="reload-status">⟳ aguardando...</div>
 
 <div id="loading">
   <p>Carregando painel...</p>
@@ -750,7 +753,16 @@ function agendarReloadGitHub(){
     return espera;
   }
 
+  function setStatus(msg, cor){
+    const el = document.getElementById('reload-status');
+    if(!el) return;
+    el.textContent = msg;
+    el.style.color = cor || 'rgba(201,168,76,0.4)';
+  }
+
   function executarReload(){
+    const agora = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+    setStatus('⟳ verificando... ' + agora, 'rgba(201,168,76,0.8)');
     const url = 'https://vivendas-do-imperador.github.io/painel-elevador/?nocache='+Date.now();
     fetch(url, {cache:'no-store'})
       .then(r => r.text())
@@ -759,16 +771,18 @@ function agendarReloadGitHub(){
         const atualHash = sessionStorage.getItem('painelHash');
         if(!atualHash){
           sessionStorage.setItem('painelHash', novoHash);
-          console.log('[Painel] Hash inicial registrado.');
+          setStatus('✓ ok ' + agora, 'rgba(201,168,76,0.4)');
         } else if(atualHash !== novoHash){
           sessionStorage.setItem('painelHash', novoHash);
-          console.log('[Painel] Nova versão detectada — recarregando...');
+          setStatus('↻ atualizando...', '#2ecc71');
           setTimeout(()=>{ window.location.reload(true); }, 500);
         } else {
-          console.log('[Painel] Sem atualizações em ' + new Date().toLocaleTimeString('pt-BR'));
+          setStatus('✓ ok ' + agora, 'rgba(201,168,76,0.4)');
+          console.log('[Painel] Sem atualizações em ' + agora);
         }
       })
       .catch(e => {
+        setStatus('✗ erro ' + agora, 'rgba(231,76,60,0.6)');
         console.warn('[Painel] Erro na varredura, tentando novamente em 2 min:', e);
         setTimeout(executarReload, 2 * 60 * 1000);
         return;
