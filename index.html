@@ -64,7 +64,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #mercado-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.5vw}
 .mercado-item{background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:5px;padding:0.7vh 0.5vw;text-align:center}
 .mercado-nome{font-size:0.85vw;font-weight:700;letter-spacing:0.1vw;text-transform:uppercase;color:var(--oul);margin-bottom:0.3vh}
-.mercado-valor{font-family:'Playfair Display',serif;font-size:2.2vh;color:var(--br);line-height:1}
+.mercado-valor{font-family:'Playfair Display',serif;font-size:2.8vh;color:var(--br);line-height:1}
 .mercado-var{font-size:1.5vh;font-weight:700;margin-top:0.2vh}
 .mercado-var.up{color:var(--verde)}
 .mercado-var.down{color:var(--vermelho)}
@@ -241,7 +241,7 @@ const CSV = {
   CONTROLE: BASE+'?gid=1285560480&single=true&output=csv',
 };
 const CFG = {
-  TEMPO_AVISO: 12000,
+  TEMPO_AVISO: 30000,
   TEMPO_FRASE: 10000,
   CLIMA_LAT: -22.9039,
   CLIMA_LON: -43.4205,
@@ -473,7 +473,7 @@ async function fetchRSS(feedUrl){
 let noticiaIdx = 0;
 let todasNoticias = [];
 let noticiaTimer = null;
-const TEMPO_NOTICIA = 20000;
+const TEMPO_NOTICIA = 25000;
 const GRUPO_NOTICIAS = 3;
 
 const FONTE_LOGOS = {
