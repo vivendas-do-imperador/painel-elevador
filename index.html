@@ -67,13 +67,12 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 .mercado-var.neu{color:var(--cinza)}
 
 /* NOTICIAS */
-#noticias-box{flex:1;padding:14px 36px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.08);overflow:hidden;display:flex;flex-direction:column}
+#noticias-box{flex:1;padding:20px 36px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.12);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+#noticias-box::before{content:'';position:absolute;top:0;left:24px;right:24px;height:1px;background:linear-gradient(90deg,transparent,var(--ou),transparent)}
 #noticias-tag{font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--ou);margin-bottom:10px;flex-shrink:0}
-#noticias-lista{flex:1;overflow:hidden;position:relative}
-.noticia-item{padding:8px 0;border-bottom:1px solid rgba(201,168,76,0.1);display:flex;align-items:flex-start;gap:10px}
-.noticia-item:last-child{border-bottom:none}
-.noticia-fonte{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ou);white-space:nowrap;margin-top:2px;min-width:38px}
-.noticia-titulo{font-size:15px;color:rgba(240,234,216,0.85);line-height:1.3;font-weight:300}
+#noticias-fonte{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--az0);background:var(--ou);padding:2px 12px;border-radius:3px;margin-bottom:10px;flex-shrink:0}
+#noticias-titulo{font-family:'Playfair Display',serif;font-size:22px;color:var(--br);line-height:1.4;font-weight:400;font-style:italic;flex:1}
+#noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--ou),var(--oul));box-shadow:0 0 6px var(--ou);transition:width linear;flex-shrink:0;margin-top:10px}
 #noticias-status{font-size:12px;color:rgba(240,234,216,0.3);font-style:italic}
 
 /* FRASE */
@@ -196,9 +195,9 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
       <!-- NOTÍCIAS -->
       <div id="noticias-box">
         <div id="noticias-tag">✦ Notícias do Dia</div>
-        <div id="noticias-lista">
-          <div id="noticias-status">Carregando notícias...</div>
-        </div>
+        <div id="noticias-fonte">—</div>
+        <div id="noticias-titulo">Carregando notícias...</div>
+        <div id="noticias-progresso"></div>
       </div>
 
       <!-- FRASE -->
@@ -477,20 +476,36 @@ async function fetchRSS(feedUrl){
 let noticiaIdx = 0;
 let todasNoticias = [];
 let noticiaTimer = null;
+const TEMPO_NOTICIA = 8000;
+
+function mostrarNoticia(item){
+  if(!item) return;
+  document.getElementById('noticias-fonte').textContent = item.fonte;
+  document.getElementById('noticias-titulo').textContent = item.titulo;
+  const b = document.getElementById('noticias-progresso');
+  b.style.transition = 'none'; b.style.width = '0%';
+  clearTimeout(noticiaTimer);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    b.style.transition = 'width '+TEMPO_NOTICIA+'ms linear'; b.style.width = '100%';
+  }));
+  noticiaTimer = setTimeout(proximaNoticia, TEMPO_NOTICIA);
+}
+
+function proximaNoticia(){
+  if(!todasNoticias.length) return;
+  noticiaIdx = (noticiaIdx+1) % todasNoticias.length;
+  mostrarNoticia(todasNoticias[noticiaIdx]);
+}
 
 function mostrarNoticias(lista){
-  const container = document.getElementById('noticias-lista');
   if(!lista || lista.length === 0){
-    container.innerHTML = '<div id="noticias-status">Notícias indisponíveis no momento.</div>';
+    document.getElementById('noticias-fonte').textContent = 'INFO';
+    document.getElementById('noticias-titulo').textContent = 'Notícias indisponíveis no momento.';
     return;
   }
-  container.innerHTML = '';
-  lista.forEach(item=>{
-    const div = document.createElement('div');
-    div.className = 'noticia-item';
-    div.innerHTML = '<span class="noticia-fonte">'+item.fonte+'</span><span class="noticia-titulo">'+item.titulo+'</span>';
-    container.appendChild(div);
-  });
+  todasNoticias = lista;
+  noticiaIdx = 0;
+  mostrarNoticia(lista[0]);
 }
 
 async function carregarNoticias(){
@@ -501,17 +516,12 @@ async function carregarNoticias(){
   resultados.forEach(res=>{
     if(res.status==='fulfilled') res.value.forEach(item=>lista.push(item));
   });
-  if(!lista.length){
-    todasNoticias = NOTICIAS_FALLBACK;
-    mostrarNoticias(NOTICIAS_FALLBACK);
-    return;
-  }
+  if(!lista.length){ mostrarNoticias(NOTICIAS_FALLBACK); return; }
   for(let i=lista.length-1;i>0;i--){
     const j=Math.floor(Math.random()*(i+1));
     [lista[i],lista[j]]=[lista[j],lista[i]];
   }
-  todasNoticias = lista;
-  mostrarNoticias(lista.slice(0, CFG.MAX_NOTICIAS));
+  mostrarNoticias(lista);
 }
 
 /* =========================================================
@@ -653,20 +663,6 @@ function fecharVideo(){
 }
 
 /* =========================================================
-   ROTAÇÃO DE NOTÍCIAS (a cada 2 min troca as visíveis)
-   ========================================================= */
-let noticiaOffset = 0;
-function rotacionarNoticias(){
-  if(todasNoticias.length <= CFG.MAX_NOTICIAS) return;
-  noticiaOffset = (noticiaOffset + CFG.MAX_NOTICIAS) % todasNoticias.length;
-  const slice = [];
-  for(let i=0;i<CFG.MAX_NOTICIAS;i++){
-    slice.push(todasNoticias[(noticiaOffset+i)%todasNoticias.length]);
-  }
-  mostrarNoticias(slice);
-}
-
-/* =========================================================
    INICIALIZAÇÃO
    ========================================================= */
 async function init(){
@@ -681,7 +677,6 @@ async function init(){
 
   await carregarNoticias();
   setInterval(carregarNoticias, CFG.NOTICIAS_INT);
-  setInterval(rotacionarNoticias, 120000);
 
   await verificarFeriado();
 
