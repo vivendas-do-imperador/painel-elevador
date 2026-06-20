@@ -17,7 +17,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 
 /* HEADER */
 #header{height:110px;display:flex;align-items:center;justify-content:space-between;padding:0 56px;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-bottom:2px solid var(--ou);position:relative;z-index:10;flex-shrink:0}
-#logo-wrap img{height:105px}
+#logo-wrap img{height:125px}
 #header-center{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
 #header-center h1{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--oul);letter-spacing:6px;text-transform:uppercase}
 #header-center .sub{font-size:15px;color:rgba(240,234,216,0.85);letter-spacing:5px;text-transform:uppercase;margin-top:5px}
@@ -68,12 +68,14 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 .mercado-var.neu{color:var(--cinza)}
 
 /* NOTICIAS */
-#noticias-box{flex:1;padding:20px 36px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.12);display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+#noticias-box{flex:1;padding:18px 36px 14px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.12);display:flex;flex-direction:column;position:relative;overflow:hidden}
 #noticias-box::before{content:'';position:absolute;top:0;left:24px;right:24px;height:1px;background:linear-gradient(90deg,transparent,var(--ou),transparent)}
 #noticias-tag{font-size:13px;font-weight:600;letter-spacing:4px;text-transform:uppercase;color:var(--ou);margin-bottom:10px;flex-shrink:0}
-#noticias-fonte{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--az0);background:var(--ou);padding:2px 12px;border-radius:3px;margin-bottom:10px;flex-shrink:0}
-#noticias-titulo{font-family:'Playfair Display',serif;font-size:22px;color:var(--br);line-height:1.4;font-weight:400;font-style:italic;flex:1}
-#noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--ou),var(--oul));box-shadow:0 0 6px var(--ou);transition:width linear;flex-shrink:0;margin-top:10px}
+#noticias-lista-multi{flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.n-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:6px;flex:1}
+.n-fonte{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--az0);background:var(--ou);padding:2px 8px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.n-titulo{font-family:'Playfair Display',serif;font-size:18px;color:var(--br);line-height:1.35;font-weight:400;font-style:italic}
+#noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--ou),var(--oul));box-shadow:0 0 6px var(--ou);transition:width linear;flex-shrink:0;margin-top:8px}
 #noticias-status{font-size:12px;color:rgba(240,234,216,0.3);font-style:italic}
 
 /* FRASE */
@@ -196,8 +198,11 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
       <!-- NOTÍCIAS -->
       <div id="noticias-box">
         <div id="noticias-tag">✦ Notícias do Dia</div>
-        <div id="noticias-fonte">—</div>
-        <div id="noticias-titulo">Carregando notícias...</div>
+        <div id="noticias-lista-multi">
+          <div class="n-item"><span class="n-fonte">—</span><span class="n-titulo">Carregando...</span></div>
+          <div class="n-item"><span class="n-fonte">—</span><span class="n-titulo">Carregando...</span></div>
+          <div class="n-item"><span class="n-fonte">—</span><span class="n-titulo">Carregando...</span></div>
+        </div>
         <div id="noticias-progresso"></div>
       </div>
 
@@ -477,12 +482,19 @@ async function fetchRSS(feedUrl){
 let noticiaIdx = 0;
 let todasNoticias = [];
 let noticiaTimer = null;
-const TEMPO_NOTICIA = 8000;
+const TEMPO_NOTICIA = 10000;
+const GRUPO_NOTICIAS = 3;
 
-function mostrarNoticia(item){
-  if(!item) return;
-  document.getElementById('noticias-fonte').textContent = item.fonte;
-  document.getElementById('noticias-titulo').textContent = item.titulo;
+function mostrarGrupoNoticias(){
+  const container = document.getElementById('noticias-lista-multi');
+  if(!todasNoticias.length) return;
+  const items = container.querySelectorAll('.n-item');
+  items.forEach((el, i) => {
+    const idx = (noticiaIdx + i) % todasNoticias.length;
+    const noticia = todasNoticias[idx];
+    el.querySelector('.n-fonte').textContent = noticia.fonte;
+    el.querySelector('.n-titulo').textContent = noticia.titulo;
+  });
   const b = document.getElementById('noticias-progresso');
   b.style.transition = 'none'; b.style.width = '0%';
   clearTimeout(noticiaTimer);
@@ -494,19 +506,19 @@ function mostrarNoticia(item){
 
 function proximaNoticia(){
   if(!todasNoticias.length) return;
-  noticiaIdx = (noticiaIdx+1) % todasNoticias.length;
-  mostrarNoticia(todasNoticias[noticiaIdx]);
+  noticiaIdx = (noticiaIdx + GRUPO_NOTICIAS) % todasNoticias.length;
+  mostrarGrupoNoticias();
 }
 
 function mostrarNoticias(lista){
   if(!lista || lista.length === 0){
-    document.getElementById('noticias-fonte').textContent = 'INFO';
-    document.getElementById('noticias-titulo').textContent = 'Notícias indisponíveis no momento.';
+    const container = document.getElementById('noticias-lista-multi');
+    container.querySelectorAll('.n-titulo').forEach(el => el.textContent = 'Notícias indisponíveis no momento.');
     return;
   }
   todasNoticias = lista;
   noticiaIdx = 0;
-  mostrarNoticia(lista[0]);
+  mostrarGrupoNoticias();
 }
 
 async function carregarNoticias(){
