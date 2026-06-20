@@ -759,15 +759,20 @@ function agendarReloadGitHub(){
         const atualHash = sessionStorage.getItem('painelHash');
         if(!atualHash){
           sessionStorage.setItem('painelHash', novoHash);
+          console.log('[Painel] Hash inicial registrado.');
         } else if(atualHash !== novoHash){
           sessionStorage.setItem('painelHash', novoHash);
           console.log('[Painel] Nova versão detectada — recarregando...');
-          setTimeout(()=>{ window.location.href = url; }, 500);
+          setTimeout(()=>{ window.location.reload(true); }, 500);
         } else {
-          console.log('[Painel] Sem atualizações.');
+          console.log('[Painel] Sem atualizações em ' + new Date().toLocaleTimeString('pt-BR'));
         }
       })
-      .catch(()=>{ window.location.href = url; });
+      .catch(e => {
+        console.warn('[Painel] Erro na varredura, tentando novamente em 2 min:', e);
+        setTimeout(executarReload, 2 * 60 * 1000);
+        return;
+      });
 
     // Agenda próxima varredura em 5 minutos
     setTimeout(executarReload, calcularEspera());
@@ -775,7 +780,8 @@ function agendarReloadGitHub(){
 
   const primeiraEspera = calcularEspera();
   console.log('[Painel] Primeira varredura em ' + Math.round(primeiraEspera/1000/60) + ' min');
-  setTimeout(executarReload, primeiraEspera);
+  // Varredura inicial após 30 segundos (para garantir que a página carregou)
+  setTimeout(executarReload, 30 * 1000);
 }
 
 // Fallback loading
