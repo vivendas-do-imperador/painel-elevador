@@ -17,13 +17,14 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 
 /* HEADER */
 #header{height:110px;display:flex;align-items:center;justify-content:space-between;padding:0 56px;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-bottom:2px solid var(--ou);position:relative;z-index:10;flex-shrink:0}
-#logo-wrap img{height:90px}
+#logo-wrap img{height:105px}
 #header-center{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
-#header-center h1{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--oul);letter-spacing:5px;text-transform:uppercase}
-#header-center .sub{font-size:12px;color:rgba(240,234,216,0.4);letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+#header-center h1{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:var(--oul);letter-spacing:6px;text-transform:uppercase}
+#header-center .sub{font-size:15px;color:rgba(240,234,216,0.85);letter-spacing:5px;text-transform:uppercase;margin-top:5px}
 #relogio-wrap{text-align:right}
-#hora{font-family:'Playfair Display',serif;font-size:54px;color:var(--oul);line-height:1;letter-spacing:2px}
-#data{font-size:13px;color:rgba(240,234,216,0.5);margin-top:4px;text-transform:capitalize}
+#hora{font-family:'Playfair Display',serif;font-size:58px;color:var(--oul);line-height:1;letter-spacing:2px}
+#data{font-size:15px;color:rgba(240,234,216,0.9);margin-top:4px;text-transform:capitalize;font-weight:500}
+#lua-badge{font-size:14px;color:rgba(240,234,216,0.9);margin-top:4px;letter-spacing:2px;font-weight:500}
 
 /* CORPO */
 #corpo{display:flex;height:calc(1080px - 110px - 60px)}
@@ -52,7 +53,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #clima-temp sup{font-size:30px;vertical-align:top;margin-top:12px}
 #clima-info{margin-left:6px}
 #clima-info h3{font-family:'Playfair Display',serif;font-size:26px;color:var(--br)}
-#clima-info p{font-size:16px;color:rgba(240,234,216,0.55);margin-top:4px}
+#clima-info p{font-size:16px;color:rgba(240,234,216,0.9);margin-top:4px;font-weight:500}
 
 /* MERCADO */
 #mercado-box{padding:10px 28px;border-bottom:1px solid rgba(201,168,76,0.2);background:rgba(0,0,0,0.1);flex-shrink:0}
@@ -85,9 +86,9 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #ticker-bar{height:60px;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
 #ticker-label{flex-shrink:0;height:100%;padding:0 30px;display:flex;align-items:center;background:var(--ou);font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);padding-right:32px}
 #ticker-scroll-wrap{flex:1;overflow:hidden;height:100%}
-#ticker-content{display:flex;align-items:center;height:100%;white-space:nowrap;animation:ticker 80s linear infinite}
-#ticker-content span{font-size:21px;color:rgba(240,234,216,0.85);padding:0 44px;font-weight:300}
-#ticker-content span::after{content:' ✶ ';color:var(--ou);opacity:0.7}
+#ticker-content{display:flex;align-items:center;height:100%;white-space:nowrap;animation:ticker 45s linear infinite}
+#ticker-content span{font-size:21px;color:rgba(240,234,216,0.95);padding:0 44px;font-weight:400}
+#ticker-content span::after{content:' ✶ ';color:var(--ou);opacity:0.9}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* FERIADO BADGE */
@@ -99,7 +100,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #video-fechar{position:absolute;top:12px;right:12px;background:rgba(201,168,76,0.8);border:none;color:#000;font-size:20px;font-weight:700;width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:51}
 
 /* LUA */
-#lua-badge{font-size:13px;color:rgba(240,234,216,0.4);margin-top:5px;letter-spacing:2px}
+
 
 /* LOADING */
 #loading{position:fixed;inset:0;z-index:999;background:var(--az0);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease}
@@ -687,9 +688,59 @@ async function init(){
   setInterval(verificarControle, 30000);
   setInterval(carregarAvisos, 300000);
 
+  agendarReloadGitHub();
+
   const ld = document.getElementById('loading');
   ld.style.opacity='0';
   setTimeout(()=>ld.style.display='none', 1000);
+}
+
+/* =========================================================
+   RELOAD AUTOMÁTICO — GitHub Pages (GMT-3)
+   Varredura silenciosa a cada 5 minutos
+   ========================================================= */
+function agendarReloadGitHub(){
+  function calcularEspera(){
+    // Horário atual em GMT-3
+    const agora = new Date();
+    const gmt3 = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
+    const minutos = gmt3.getUTCMinutes();
+    const segundos = gmt3.getUTCSeconds();
+    const ms = gmt3.getUTCMilliseconds();
+
+    // Próximo múltiplo de 5 minutos
+    const proximoMultiplo = Math.ceil((minutos + 0.001) / 5) * 5;
+    const minutosAte = proximoMultiplo - minutos;
+    const espera = (minutosAte * 60 * 1000) - (segundos * 1000) - ms;
+    return espera;
+  }
+
+  function executarReload(){
+    const url = 'https://vivendas-do-imperador.github.io/painel-elevador/?nocache='+Date.now();
+    fetch(url, {cache:'no-store'})
+      .then(r => r.text())
+      .then(html => {
+        const novoHash = html.length + '_' + html.slice(100, 300).replace(/\s/g,'');
+        const atualHash = sessionStorage.getItem('painelHash');
+        if(!atualHash){
+          sessionStorage.setItem('painelHash', novoHash);
+        } else if(atualHash !== novoHash){
+          sessionStorage.setItem('painelHash', novoHash);
+          console.log('[Painel] Nova versão detectada — recarregando...');
+          setTimeout(()=>{ window.location.href = url; }, 500);
+        } else {
+          console.log('[Painel] Sem atualizações.');
+        }
+      })
+      .catch(()=>{ window.location.href = url; });
+
+    // Agenda próxima varredura em 5 minutos
+    setTimeout(executarReload, calcularEspera());
+  }
+
+  const primeiraEspera = calcularEspera();
+  console.log('[Painel] Primeira varredura em ' + Math.round(primeiraEspera/1000/60) + ' min');
+  setTimeout(executarReload, primeiraEspera);
 }
 
 // Fallback loading
