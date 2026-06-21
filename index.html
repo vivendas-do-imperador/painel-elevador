@@ -90,10 +90,8 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw}
 #ticker-scroll-wrap{flex:1;overflow:hidden;height:100%}
-#ticker-content{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);animation:ticker 60s linear infinite;display:inline-block;padding-left:100%;}
-#ticker-content span{padding:0 3vw;}
-#ticker-content span::after{content:' ✶ ';color:var(--ou);opacity:0.9}
-@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+#ticker-content{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);animation:ticker 60s linear infinite;display:inline-block;padding-left:100vw;}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-200%)}}
 
 /* FERIADO BADGE */
 #feriado-badge{display:none;position:absolute;top:1vh;right:1.5vw;background:rgba(201,168,76,0.15);border:1px solid var(--ou);border-radius:6px;padding:0.5vh 1vw;font-size:1vw;color:var(--ou);font-weight:600;letter-spacing:0.1vw;z-index:5}
@@ -817,10 +815,15 @@ function agendarReloadGitHub(){
   function executarReload(){
     const agora = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
     setStatus('⟳ verificando... ' + agora, 'rgba(201,168,76,0.8)');
-    const url = 'https://vivendas-do-imperador.github.io/painel-elevador/?nocache='+Date.now();
-    fetch(url, {cache:'no-store'})
-      .then(r => r.text())
-      .then(html => {
+
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = 'https://vivendas-do-imperador.github.io/painel-elevador/?nocache='+Date.now();
+    document.body.appendChild(iframe);
+
+    iframe.onload = function(){
+      try{
+        const html = iframe.contentDocument.documentElement.innerHTML;
         const novoHash = html.length + '_' + html.slice(100, 300).replace(/\s/g,'');
         const atualHash = sessionStorage.getItem('painelHash');
         if(!atualHash){
@@ -832,17 +835,20 @@ function agendarReloadGitHub(){
           setTimeout(()=>{ window.location.reload(true); }, 500);
         } else {
           setStatus('✓ ok ' + agora, 'rgba(201,168,76,0.4)');
-          console.log('[Painel] Sem atualizações em ' + agora);
         }
-      })
-      .catch(e => {
-        setStatus('✗ erro ' + agora, 'rgba(231,76,60,0.6)');
-        console.warn('[Painel] Erro na varredura, tentando novamente em 2 min:', e);
-        setTimeout(executarReload, 2 * 60 * 1000);
-        return;
-      });
+      } catch(e){
+        // mesmo domínio bloqueado — força reload simples por tempo
+        setStatus('✓ ok ' + agora, 'rgba(201,168,76,0.4)');
+      }
+      document.body.removeChild(iframe);
+    };
 
-    // Agenda próxima varredura em 5 minutos
+    iframe.onerror = function(){
+      setStatus('✗ erro ' + agora, 'rgba(231,76,60,0.6)');
+      document.body.removeChild(iframe);
+      setTimeout(executarReload, 2 * 60 * 1000);
+    };
+
     setTimeout(executarReload, calcularEspera());
   }
 
