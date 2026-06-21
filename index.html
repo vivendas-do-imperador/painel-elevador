@@ -594,7 +594,7 @@ function mostrarAviso(item){
   if(item.midia){tocarVideo(item.midia);proximoAvisoComDelay(CFG.TEMPO_AVISO*2);return;}
   const iconeEl = document.getElementById('aviso-icone');
   if(item.darkelsLogo){
-    iconeEl.innerHTML = '<img src="'+item.darkelsLogo+'" style="height:8vh;object-fit:contain;">';
+    iconeEl.innerHTML = '<img src="'+item.darkelsLogo+'" style="height:16vh;object-fit:contain;">';
   } else {
     iconeEl.textContent = item.icone||'📢';
   }
