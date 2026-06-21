@@ -295,16 +295,22 @@ async function fetchCSV(url){
   try{
     const r = await fetch(url+'&t='+Date.now());
     const txt = await r.text();
-    return txt.trim().split('\n').map(l=>{
+    const rows = txt.trim().split('\n').map(l=>{
       const cols=[]; let cur=''; let inQ=false;
       for(let i=0;i<l.length;i++){
         const c=l[i];
-        if(c==='"'){inQ=!inQ;}
+        if(c==='"'){
+          if(inQ && l[i+1]==='"'){ cur+=c; i++; } // handle double quotes ""
+          else { inQ=!inQ; }
+        }
         else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
         else{cur+=c;}
       }
       cols.push(cur.trim()); return cols;
-    }).slice(3);
+    });
+    // Remove as linhas de cabeçalho (geralmente a primeira linha)
+    // Se sua planilha tem mais linhas de topo, ajuste o slice(1) para slice(2) ou slice(3)
+    return rows.slice(1);
   }catch(e){return[];}
 }
 
@@ -674,12 +680,16 @@ async function carregarTicker(){
 
 function iniciarTickerScroll(){
   const el = document.getElementById('ticker-text');
-  if(!el || !tickerTextos.length) return;
+  if(!el) return;
+  
+  // Se não houver textos da planilha, usa o fallback padrão
+  const textosParaExibir = tickerTextos.length ? tickerTextos : TICKER_EX;
+  
   const container = document.getElementById('ticker-scroll');
   const W = container.offsetWidth || window.innerWidth;
 
   // Duplica o texto para garantir um loop contínuo
-  el.textContent = [...tickerTextos, ...tickerTextos].join('   ✶   ');
+  el.textContent = [...textosParaExibir, ...textosParaExibir].join('   ✶   ');
   
   // Reseta a posição inicial para o final do container
   tickerX = W;
