@@ -87,9 +87,9 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 #frase-autor{font-size:1.1vw;color:var(--ou);letter-spacing:0.2vw;text-transform:uppercase;margin-top:0.8vh}
 
 /* TICKER */
-#ticker-scroll{flex:1;overflow:hidden;height:100%;}
-#ticker-text{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);display:inline-block;padding-left:100vw;}
-@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+#ticker-scroll{flex:1;overflow:hidden;height:100%;position:relative;}
+#ticker-text{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);position:absolute;top:50%;transform:translateY(-50%);left:0;}
+@keyframes tickermove{from{left:100%}to{left:var(--ticker-end)}}
 #ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw}
 100%{transform:translateX(-100%)}}
@@ -666,16 +666,15 @@ async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
   const textos = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
   const el = document.getElementById('ticker-text');
-  if(!textos.length){ el.textContent=''; el.style.animation='none'; return; }
-  const txt = [...textos,...textos].join('   ✶   ');
-  el.textContent = txt;
-  el.style.animation='none'; el.offsetHeight;
-  const larguraTela = window.innerWidth || 1920;
-  const larguraTexto = el.scrollWidth;
-  const total = larguraTela + larguraTexto;
-  const vel = 60; // pixels por segundo
-  const dur = Math.round(total / vel);
-  el.style.animation='ticker '+dur+'s linear infinite';
+  if(!textos.length){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.textContent = [...textos,...textos,...textos].join('   ✶   ');
+  el.style.animation='none';
+  el.offsetHeight;
+  const W = el.scrollWidth;
+  const dur = Math.round(W / 80);
+  el.style.setProperty('--ticker-end', '-'+W+'px');
+  el.style.animation='tickermove '+dur+'s linear infinite';
 }
 
 /* =========================================================
