@@ -673,7 +673,7 @@ async function carregarTicker(){
   const larguraTela = window.innerWidth || 1920;
   const larguraTexto = el.scrollWidth;
   const total = larguraTela + larguraTexto;
-  const vel = 120; // pixels por segundo
+  const vel = 60; // pixels por segundo
   const dur = Math.round(total / vel);
   el.style.animation='ticker '+dur+'s linear infinite';
 }
