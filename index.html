@@ -85,8 +85,8 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:#000;font-family:'
 /* TICKER */
 #ticker-bar{height:6vh;flex-shrink:0;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10,#0a1828,#040a10);border-top:2px solid var(--ou);position:relative}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw;z-index:2}
-#ticker-scroll{flex:1;overflow:hidden;height:100%;position:relative}
-#ticker-text{white-space:nowrap;font-size:1.6vw;font-weight:400;color:rgba(240,234,216,0.95);position:absolute;top:50%;transform:translateY(-50%);left:100%}
+#ticker-scroll{flex:1;overflow:hidden;height:100%;}
+#ticker-text{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);animation:ticker 60s linear infinite;display:inline-block;padding-left:100%;}
 
 /* RELOAD STATUS */
 #reload-status{position:fixed;bottom:6.5vh;right:0.5vw;font-size:0.7vw;color:rgba(201,168,76,0.4);font-family:'Inter',sans-serif;z-index:999;pointer-events:none}
@@ -96,6 +96,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:#000;font-family:'
 #loading p{font-size:1vw;color:var(--ou);letter-spacing:0.4vw;text-transform:uppercase}
 .spinner{width:44px;height:44px;margin-top:2vh;border:2px solid rgba(201,168,76,0.15);border-top-color:var(--ou);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
 </style>
 </head>
 <body>
@@ -474,29 +475,13 @@ let tickerLarguraTela=0;
 let tickerLarguraTexto=0;
 
 async function carregarTicker(){
-  const rows=await fetchCSV(CSV.TICKER);
-  const textos=rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
-  const el=document.getElementById('ticker-text');
-  if(!textos.length){el.textContent='';return;}
-  el.textContent=[...textos,...textos].join('   ✶   ');
-  iniciarTicker();
-}
-
-function iniciarTicker(){
-  const el=document.getElementById('ticker-text');
-  const scroll=document.getElementById('ticker-scroll');
-  tickerLarguraTela=scroll.offsetWidth||window.innerWidth;
-  tickerLarguraTexto=el.scrollWidth;
-  tickerPos=tickerLarguraTela;
-  el.style.left=tickerPos+'px';
-  if(tickerRAF)cancelAnimationFrame(tickerRAF);
-  function animar(){
-    tickerPos-=1.5;
-    if(tickerPos<-tickerLarguraTexto)tickerPos=tickerLarguraTela;
-    el.style.left=tickerPos+'px';
-    tickerRAF=requestAnimationFrame(animar);
-  }
-  tickerRAF=requestAnimationFrame(animar);
+  const rows = await fetchCSV(CSV.TICKER);
+  const textos = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
+  if(!textos.length){ document.getElementById('ticker-text').textContent=''; return; }
+  const el = document.getElementById('ticker-text');
+  el.textContent = [...textos,...textos].join('   ✶   ');
+  el.style.animation='none'; el.offsetHeight;
+  el.style.animation='ticker '+Math.max(90,textos.join('').length*0.45)+'s linear infinite';
 }
 
 /* =========================================================
