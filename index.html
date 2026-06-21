@@ -654,7 +654,7 @@ function proximaFrase(){if(!frases.length)return;fraseIdx=(fraseIdx+1)%frases.le
 
 async function carregarFrases(){
   const rows = await fetchCSV(CSV.FRASES);
-  const lista = rows.filter(x=>x[0]&&x[2]!=='NÃO').map(x=>({frase:x[0],autor:x[1]||''}));
+  const lista = rows.filter(x=>x[0]&&x[2]==='SIM').map(x=>({frase:x[0],autor:x[1]||''}));
   frases = lista.length ? lista : FRASES_EX;
   if(frases.length) mostrarFrase(frases[0]);
   setInterval(proximaFrase, CFG.TEMPO_FRASE);
