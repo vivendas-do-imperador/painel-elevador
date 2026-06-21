@@ -486,22 +486,19 @@ async function carregarTicker(){
 
 function iniciarTickerJS(){
   const el = document.getElementById('ticker-text');
-  const scroll = document.getElementById('ticker-scroll');
   if(!el || !el.textContent) return;
   if(window._tickerRAF) cancelAnimationFrame(window._tickerRAF);
-  // Mede largura real do texto
+  const W = window.innerWidth;
+  // Mede largura real colocando o elemento visível na posição 0
   el.style.left = '0px';
-  el.style.visibility = 'hidden';
-  const largTexto = el.offsetWidth || el.scrollWidth;
-  el.style.visibility = '';
-  // Começa fora da tela à direita (usa largura total da janela)
-  const largScroll = scroll.offsetWidth || window.innerWidth;
-  let pos = largScroll;
+  const largTexto = el.getBoundingClientRect().width;
+  // Começa fora da tela à direita
+  let pos = W;
   el.style.left = pos + 'px';
   function animar(){
     pos -= 1.5;
-    // Quando sair completamente pela esquerda, volta ao início
-    if(pos < -(largTexto + 50)) pos = largScroll;
+    // Quando o texto saiu completamente pela esquerda, volta ao início
+    if(pos + largTexto < 0) pos = W;
     el.style.left = pos + 'px';
     window._tickerRAF = requestAnimationFrame(animar);
   }
