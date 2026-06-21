@@ -665,15 +665,11 @@ async function carregarFrases(){
 async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
   const textos = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
-  if(!textos.length){ document.getElementById('ticker-content').textContent=''; return; }
   const el = document.getElementById('ticker-content');
+  if(!textos.length){ el.textContent=''; el.style.animation='none'; return; }
   el.textContent = [...textos,...textos].join('   ✶   ');
   el.style.animation='none'; el.offsetHeight;
   el.style.animation='ticker '+Math.max(90,textos.join('').length*0.45)+'s linear infinite';
-} else {
-    el.innerHTML = '';
-    el.style.animation = 'none';
-  }
 }
 
 /* =========================================================
