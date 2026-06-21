@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Painel — Vivendas do Imperador</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;&family=Inter:wght@300;;;&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -88,10 +88,10 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 
 /* TICKER */
 #ticker-scroll{flex:1;overflow:hidden;height:100%;position:relative;}
-#ticker-text{white-space:nowrap;font-size:1.8vw;font-weight:500;color:rgba(240,234,216,0.95);position:absolute;top:50%;transform:translateY(-50%);left:100%;will-change: transform, left; line-height: 1.2;}
-#ticker-bar{height:7vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou);contain: content;}
+#ticker-text{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);position:absolute;top:50%;transform:translateY(-50%);left:0;}
+#ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw}
-
+100%{transform:translateX(-100%)}}
 
 /* FERIADO BADGE */
 #feriado-badge{display:none;position:absolute;top:1vh;right:1.5vw;background:rgba(201,168,76,0.15);border:1px solid var(--ou);border-radius:6px;padding:0.5vh 1vw;font-size:1vw;color:var(--ou);font-weight:600;letter-spacing:0.1vw;z-index:5}
@@ -295,22 +295,16 @@ async function fetchCSV(url){
   try{
     const r = await fetch(url+'&t='+Date.now());
     const txt = await r.text();
-    const rows = txt.trim().split('\n').map(l=>{
+    return txt.trim().split('\n').map(l=>{
       const cols=[]; let cur=''; let inQ=false;
       for(let i=0;i<l.length;i++){
         const c=l[i];
-        if(c==='"'){
-          if(inQ && l[i+1]==='"'){ cur+=c; i++; } // handle double quotes ""
-          else { inQ=!inQ; }
-        }
+        if(c==='"'){inQ=!inQ;}
         else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
         else{cur+=c;}
       }
       cols.push(cur.trim()); return cols;
-    });
-    // Remove as linhas de cabeçalho (geralmente a primeira linha)
-    // Se sua planilha tem mais linhas de topo, ajuste o slice(1) para slice(2) ou slice(3)
-    return rows.slice(1);
+    }).slice(3);
   }catch(e){return[];}
 }
 
@@ -680,33 +674,23 @@ async function carregarTicker(){
 
 function iniciarTickerScroll(){
   const el = document.getElementById('ticker-text');
-  if(!el) return;
-  
-  // Se não houver textos da planilha, usa o fallback padrão
-  const textosParaExibir = tickerTextos.length ? tickerTextos : TICKER_EX;
-  
+  if(!el || !tickerTextos.length) return;
   const container = document.getElementById('ticker-scroll');
   const W = container.offsetWidth || window.innerWidth;
 
-  // Duplica o texto para garantir um loop contínuo
-  el.textContent = [...textosParaExibir, ...textosParaExibir].join('   ✶   ');
-  
-  // Reseta a posição inicial para o final do container
+  el.textContent = [...tickerTextos,...tickerTextos].join('   ✶   ');
+  el.style.left = W + 'px';
   tickerX = W;
-  el.style.left = tickerX + 'px';
 
   if(tickerRAF) cancelAnimationFrame(tickerRAF);
 
   const vel = 1.5; // pixels por frame
   function animar(){
     tickerX -= vel;
-    const larguraTexto = el.scrollWidth / 2; // Metade porque duplicamos o texto
-    
-    // Se a primeira metade já passou totalmente, reseta suavemente
-    if(tickerX <= -larguraTexto){
-      tickerX += larguraTexto;
+    const larguraTexto = el.scrollWidth;
+    if(tickerX < -larguraTexto){
+      tickerX = W;
     }
-    
     el.style.left = tickerX + 'px';
     tickerRAF = requestAnimationFrame(animar);
   }
