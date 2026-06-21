@@ -489,13 +489,18 @@ function iniciarTickerJS(){
   const scroll = document.getElementById('ticker-scroll');
   if(!el || !el.textContent) return;
   if(window._tickerRAF) cancelAnimationFrame(window._tickerRAF);
-  // Posição inicial: começa fora da tela à direita
-  let pos = scroll.offsetWidth || window.innerWidth;
+  // Posiciona temporariamente para medir largura real
+  el.style.left = '0px';
+  el.style.visibility = 'hidden';
+  const largTela = scroll.offsetWidth || window.innerWidth;
+  const largTexto = el.offsetWidth || el.scrollWidth;
+  el.style.visibility = '';
+  // Começa fora da tela à direita
+  let pos = largTela;
   el.style.left = pos + 'px';
   function animar(){
     pos -= 1.5;
-    const largTexto = el.scrollWidth;
-    if(pos < -largTexto) pos = scroll.offsetWidth || window.innerWidth;
+    if(pos < -largTexto) pos = largTela;
     el.style.left = pos + 'px';
     window._tickerRAF = requestAnimationFrame(animar);
   }
