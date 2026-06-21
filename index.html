@@ -88,8 +88,8 @@ html,body{width:100vw;height:100vh;overflow:hidden;margin:0;padding:0;background
 
 /* TICKER */
 #ticker-scroll{flex:1;overflow:hidden;height:100%;position:relative;}
-#ticker-text{white-space:nowrap;font-size:1.6vw;font-weight:500;color:rgba(240,234,216,0.95);position:absolute;top:50%;transform:translateY(-50%);left:0;}
-#ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
+#ticker-text{white-space:nowrap;font-size:1.8vw;font-weight:500;color:rgba(240,234,216,0.95);position:absolute;top:50%;transform:translateY(-50%);left:100%;will-change: transform, left; line-height: 1.2;}
+#ticker-bar{height:7vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou);contain: content;}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw}
 
 
@@ -678,19 +678,25 @@ function iniciarTickerScroll(){
   const container = document.getElementById('ticker-scroll');
   const W = container.offsetWidth || window.innerWidth;
 
-  el.textContent = [...tickerTextos,...tickerTextos].join('   ✶   ');
-  el.style.left = W + 'px';
+  // Duplica o texto para garantir um loop contínuo
+  el.textContent = [...tickerTextos, ...tickerTextos].join('   ✶   ');
+  
+  // Reseta a posição inicial para o final do container
   tickerX = W;
+  el.style.left = tickerX + 'px';
 
   if(tickerRAF) cancelAnimationFrame(tickerRAF);
 
   const vel = 1.5; // pixels por frame
   function animar(){
     tickerX -= vel;
-    const larguraTexto = el.scrollWidth;
-    if(tickerX < -larguraTexto){
-      tickerX = W;
+    const larguraTexto = el.scrollWidth / 2; // Metade porque duplicamos o texto
+    
+    // Se a primeira metade já passou totalmente, reseta suavemente
+    if(tickerX <= -larguraTexto){
+      tickerX += larguraTexto;
     }
+    
     el.style.left = tickerX + 'px';
     tickerRAF = requestAnimationFrame(animar);
   }
