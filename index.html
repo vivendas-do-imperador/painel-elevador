@@ -588,7 +588,7 @@ const FRASES_EX=[
   {frase:'A comunidade é onde a solidariedade se transforma em vizinhança.',autor:''},
   {frase:'Um lar não é apenas um lugar; é um sentimento de pertencimento.',autor:''},
 ];
-const TICKER_EX=['Portaria: atendimento 24 horas','Administração: seg a sex, das 09h às 18h','Em caso de emergência: ligue para a portaria'];
+const TICKER_EX=['✦ Em breve, atualizações dos informes do condomínio','✦ Fique atento às novidades no painel','✦ DarkELS — Tecnologia · Informes · Produções — (21) 99579-7058'];
 
 function mostrarAviso(item){
   if(item.midia){tocarVideo(item.midia);proximoAvisoComDelay(CFG.TEMPO_AVISO*2);return;}
@@ -668,7 +668,11 @@ async function carregarTicker(){
   const lista = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
   const itens = lista.length ? lista : TICKER_EX;
   const dup = [...itens,...itens];
-  document.getElementById('ticker-content').innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
+  const el = document.getElementById('ticker-content');
+  el.style.animation = 'none';
+  el.innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
+  el.offsetHeight; // força reflow
+  el.style.animation = '';
 }
 
 /* =========================================================
