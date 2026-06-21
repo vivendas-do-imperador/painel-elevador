@@ -678,12 +678,52 @@ async function carregarTicker(){
 /* =========================================================
    CONTROLE REMOTO (Sheets)
    ========================================================= */
+let ultimoCmd = '';
 async function verificarControle(){
   const rows = await fetchCSV(CSV.CONTROLE);
   if(!rows||!rows[0]) return;
   const cmd = (rows[0][0]||'').trim().toLowerCase();
   const val = (rows[0][1]||'').trim();
-  if(cmd==='video'&&val) tocarVideo(val);
+  const chave = cmd+'|'+val;
+  if(chave === ultimoCmd) return; // evita repetir o mesmo comando
+  ultimoCmd = chave;
+
+  if(cmd==='video' && val){
+    tocarVideo(val);
+
+  } else if(cmd==='aviso' && val){
+    // Injeta aviso de emergência imediato no painel esquerdo
+    clearTimeout(avisoTimer);
+    document.getElementById('aviso-icone').textContent = '🚨';
+    document.getElementById('aviso-tag').textContent = 'AVISO URGENTE';
+    document.getElementById('aviso-titulo').textContent = 'Atenção!';
+    document.getElementById('aviso-texto').textContent = val;
+    const b = document.getElementById('progresso-aviso');
+    b.style.transition='none'; b.style.width='0%';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      b.style.transition='width 30000ms linear'; b.style.width='100%';
+    }));
+    avisoTimer = setTimeout(proximoAviso, 30000);
+
+  } else if(cmd==='ticker' && val){
+    // Substitui rodapé por texto urgente
+    const el = document.getElementById('ticker-content');
+    el.style.animation='none';
+    el.innerHTML = `<span>🚨 ${val}</span><span>🚨 ${val}</span>`;
+    el.offsetHeight;
+    el.style.animation='';
+
+  } else if(cmd==='reload' && val.toLowerCase()==='sim'){
+    window.location.reload(true);
+
+  } else if(cmd==='off' && val.toLowerCase()==='sim'){
+    // Tela escura com mensagem
+    const overlay = document.createElement('div');
+    overlay.id = 'off-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;';
+    overlay.innerHTML = '<p style="color:rgba(255,255,255,0.2);font-size:2vw;font-family:monospace;">painel desativado</p>';
+    document.body.appendChild(overlay);
+  }
 }
 
 /* =========================================================
