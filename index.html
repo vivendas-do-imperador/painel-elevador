@@ -733,7 +733,7 @@ async function init(){
   await carregarTicker();
 
   setInterval(verificarControle, 30000);
-  setInterval(carregarAvisos, 300000);
+  setInterval(carregarAvisos, 10000);
   setInterval(carregarTicker, 10000);
 
   agendarReloadGitHub();
