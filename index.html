@@ -478,14 +478,16 @@ async function carregarAvisos(){
 
 async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
-  const lista = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
+  const lista = rows.filter(x=>x[0]&&x[0].trim()&&x[1]==='SIM').map(x=>x[0].trim());
   const itens = lista.length ? lista : TICKER_EX;
   const dup = [...itens,...itens];
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
   el.innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
   el.offsetHeight;
-  el.style.animation = '';
+  // 6 segundos por item para dar tempo de ler todos
+  const dur = Math.max(30, itens.length * 6);
+  el.style.animation = 'ticker '+dur+'s linear infinite';
 }
 
 /* =========================================================
