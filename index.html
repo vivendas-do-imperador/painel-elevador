@@ -484,27 +484,16 @@ async function carregarTicker(){
   const itens = lista.length ? lista : TICKER_EX;
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
-  // Coloca só uma vez para medir
-  el.innerHTML = itens.map(t=>'<span>'+t+'</span>').join('');
-  el.offsetHeight;
-  // Adiciona marcador para saber onde termina o primeiro conjunto
-  const marker = document.createElement('span');
-  marker.id = 'ticker-marker';
-  marker.style.cssText = 'position:absolute;opacity:0;pointer-events:none;';
-  el.appendChild(marker);
-  // Duplica o conteúdo para loop
   el.innerHTML = [...itens,...itens].map(t=>'<span>'+t+'</span>').join('');
-  el.offsetHeight;
-  // A largura do primeiro conjunto é metade do total
-  const totalW = el.scrollWidth;
-  const halfW = totalW / 2;
-  // Cria keyframe dinâmico baseado na largura real
-  let styleEl = document.getElementById('ticker-dynamic-style');
-  if(!styleEl){ styleEl = document.createElement('style'); styleEl.id='ticker-dynamic-style'; document.head.appendChild(styleEl); }
-  styleEl.textContent = '@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-'+halfW+'px)}}';
-  // Velocidade: 150px por segundo
-  const dur = halfW / 150;
-  el.style.animation = 'ticker '+dur+'s linear infinite';
+  // Aguarda 2 frames para garantir renderização completa antes de medir
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const halfW = el.scrollWidth / 2;
+    let styleEl = document.getElementById('ticker-dynamic-style');
+    if(!styleEl){ styleEl = document.createElement('style'); styleEl.id='ticker-dynamic-style'; document.head.appendChild(styleEl); }
+    styleEl.textContent = '@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-'+halfW+'px)}}';
+    const dur = halfW / 150;
+    el.style.animation = 'ticker '+dur+'s linear infinite';
+  }));
 }
 
 /* =========================================================
