@@ -99,7 +99,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:#000;font-family:'
 #ticker-content{display:flex;align-items:center;height:100%;white-space:nowrap;animation:ticker 12s linear infinite}
 #ticker-content span{font-size:1.6vw;color:rgba(240,234,216,0.95);padding:0 3vw;font-weight:400}
 #ticker-content span::after{content:' ✶ ';color:var(--ou);opacity:0.9}
-@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 </style>
 </head>
 <body>
@@ -482,12 +482,14 @@ async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
   const lista = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
   const itens = lista.length ? lista : TICKER_EX;
-  const dup = [...itens,...itens,...itens];
+  const dup = [...itens,...itens];
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
   el.innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
   el.offsetHeight;
-  el.style.animation = '';
+  // Calcula duração baseada no número de itens para mostrar todos
+  const dur = Math.max(20, itens.length * 8);
+  el.style.animation = 'ticker '+dur+'s linear infinite';
 }
 
 /* =========================================================
