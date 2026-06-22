@@ -485,15 +485,22 @@ async function carregarTicker(){
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
   el.innerHTML = [...itens,...itens].map(t=>'<span>'+t+'</span>').join('');
-  // Aguarda 2 frames para garantir renderização completa antes de medir
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    const halfW = el.scrollWidth / 2;
+  // Mede após renderização completa
+  setTimeout(()=>{
+    // Soma largura de todos os spans do primeiro conjunto (metade)
+    const spans = el.querySelectorAll('span');
+    let halfW = 0;
+    for(let i=0; i<spans.length/2; i++){
+      halfW += spans[i].getBoundingClientRect().width;
+    }
+    // Adiciona espaçamento entre spans (padding 3vw cada lado = 6vw total)
+    halfW += (itens.length * window.innerWidth * 0.06);
     let styleEl = document.getElementById('ticker-dynamic-style');
     if(!styleEl){ styleEl = document.createElement('style'); styleEl.id='ticker-dynamic-style'; document.head.appendChild(styleEl); }
-    styleEl.textContent = '@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-'+halfW+'px)}}';
+    styleEl.textContent = '@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-'+Math.round(halfW)+'px)}}';
     const dur = halfW / 150;
     el.style.animation = 'ticker '+dur+'s linear infinite';
-  }));
+  }, 500);
 }
 
 /* =========================================================
