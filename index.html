@@ -484,10 +484,8 @@ async function carregarTicker(){
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
   el.innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
-  el.offsetHeight;
-  // 6 segundos por item para dar tempo de ler todos
   const dur = Math.max(30, itens.length * 6);
-  el.style.animation = 'ticker '+dur+'s linear infinite';
+  setTimeout(()=>{ el.style.animation = 'ticker '+dur+'s linear infinite'; }, 100);
 }
 
 /* =========================================================
