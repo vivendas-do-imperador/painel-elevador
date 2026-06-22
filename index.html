@@ -475,10 +475,6 @@ async function carregarAvisos(){
 /* =========================================================
    TICKER
    ========================================================= */
-let tickerRAF=null;
-let tickerPos=0;
-let tickerLarguraTela=0;
-let tickerLarguraTexto=0;
 
 async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
@@ -513,9 +509,10 @@ async function verificarControle(){
     avisoTimer=setTimeout(proximoAviso,30000);
   }else if(cmd==='ticker'&&val){
     const el=document.getElementById('ticker-content');
-    el.textContent='🚨 '+val+'   ✶   🚨 '+val;
-    tickerLarguraTexto=el.scrollWidth;
-    tickerPos=tickerLarguraTela;
+    el.style.animation='none';
+    el.innerHTML='<span>🚨 '+val+'</span><span>🚨 '+val+'</span>';
+    el.offsetHeight;
+    el.style.animation='';
   }else if(cmd==='reload'&&val.toLowerCase()==='sim'){
     window.location.reload(true);
   }else if(cmd==='off'&&val.toLowerCase()==='sim'){
