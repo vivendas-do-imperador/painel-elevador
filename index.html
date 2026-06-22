@@ -482,13 +482,11 @@ async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
   const lista = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
   const itens = lista.length ? lista : TICKER_EX;
-  const dup = [...itens,...itens];
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
-  el.innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
+  el.innerHTML = [...itens,...itens].map(t=>'<span>'+t+'</span>').join('');
   el.offsetHeight;
-  // Calcula duração baseada no número de itens para mostrar todos
-  const dur = Math.max(20, itens.length * 8);
+  const dur = Math.max(20, itens.join('').length * 0.15);
   el.style.animation = 'ticker '+dur+'s linear infinite';
 }
 
