@@ -479,8 +479,8 @@ async function carregarTicker(){
   const textos = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
   const el = document.getElementById('ticker-text');
   if(!textos.length){ el.textContent=''; if(window._tickerRAF) cancelAnimationFrame(window._tickerRAF); return; }
-  el.textContent = [...textos,...textos].join('   ✶   ');
-  // Inicia animação JS pura
+  // Texto simples sem duplicação
+  el.textContent = textos.join('   ✶   ');
   iniciarTickerJS();
 }
 
@@ -489,16 +489,17 @@ function iniciarTickerJS(){
   if(!el || !el.textContent) return;
   if(window._tickerRAF) cancelAnimationFrame(window._tickerRAF);
   const W = window.innerWidth;
-  // Mede largura real colocando o elemento visível na posição 0
+  // Força reflow para medir largura correta
   el.style.left = '0px';
+  el.offsetWidth; // força reflow
   const largTexto = el.getBoundingClientRect().width;
   // Começa fora da tela à direita
   let pos = W;
   el.style.left = pos + 'px';
   function animar(){
     pos -= 1.5;
-    // Quando o texto saiu completamente pela esquerda, volta ao início
-    if(pos + largTexto < 0) pos = W;
+    // Reseta quando o texto saiu completamente pela esquerda
+    if(pos < -largTexto) pos = W;
     el.style.left = pos + 'px';
     window._tickerRAF = requestAnimationFrame(animar);
   }
