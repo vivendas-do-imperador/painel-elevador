@@ -95,10 +95,11 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:#000;font-family:'
 @keyframes spin{to{transform:rotate(360deg)}}
 #ticker-bar{height:6vh;flex-shrink:0;z-index:10;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,#040a10 0%,#0a1828 50%,#040a10 100%);border-top:2px solid var(--ou)}
 #ticker-label{flex-shrink:0;height:100%;padding:0 2vw;display:flex;align-items:center;background:var(--ou);font-size:1vw;font-weight:700;letter-spacing:0.2vw;text-transform:uppercase;color:var(--az0);white-space:nowrap;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.5vw}
-#ticker-scroll-wrap{flex:1;overflow:hidden;height:100%;position:relative;}
-#ticker-content{white-space:nowrap;position:absolute;top:50%;transform:translateY(-50%);}
+#ticker-scroll-wrap{flex:1;overflow:hidden;height:100%}
+#ticker-content{display:flex;align-items:center;height:100%;white-space:nowrap;animation:ticker 28s linear infinite}
 #ticker-content span{font-size:1.6vw;color:rgba(240,234,216,0.95);padding:0 3vw;font-weight:400}
 #ticker-content span::after{content:' ✶ ';color:var(--ou);opacity:0.9}
+100%{transform:translateX(-50%)}}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 </style>
 </head>
@@ -175,6 +176,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:#000;font-family:'
   <div id="ticker-bar">
     <div id="ticker-label">✦ &nbsp;Informes</div>
     <div id="ticker-scroll-wrap"><div id="ticker-content"></div></div>
+  </div>
   </div>
   </div>
 </div>
@@ -482,32 +484,12 @@ async function carregarTicker(){
   const rows = await fetchCSV(CSV.TICKER);
   const lista = rows.filter(x=>x[0]&&x[1]==='SIM').map(x=>x[0]);
   const itens = lista.length ? lista : TICKER_EX;
+  const dup = [...itens,...itens];
   const el = document.getElementById('ticker-content');
   el.style.animation = 'none';
-  el.style.transform = 'none';
-  el.style.display = 'block';
-  el.style.whiteSpace = 'nowrap';
-  el.style.position = 'absolute';
-  el.style.top = '50%';
-  el.style.transform = 'translateY(-50%)';
-  el.innerHTML = itens.map(t=>'<span>'+t+'</span>').join('');
-  // Para qualquer animação anterior
-  if(window._tickerTimer) clearInterval(window._tickerTimer);
-  if(window._tickerRAF) cancelAnimationFrame(window._tickerRAF);
-  // Começa fora da tela à direita
-  setTimeout(()=>{
-    const largTexto = el.scrollWidth;
-    const largTela = window.innerWidth;
-    let pos = largTela;
-    el.style.left = pos + 'px';
-    function mover(){
-      pos -= 2;
-      if(pos < -largTexto) pos = largTela;
-      el.style.left = pos + 'px';
-      window._tickerRAF = requestAnimationFrame(mover);
-    }
-    window._tickerRAF = requestAnimationFrame(mover);
-  }, 300);
+  el.innerHTML = dup.map(t=>'<span>'+t+'</span>').join('');
+  el.offsetHeight;
+  el.style.animation = '';
 }
 
 /* =========================================================
