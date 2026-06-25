@@ -20,13 +20,13 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--az1);color:v
 #relogio-wrap{text-align:right;}
 #relogio{font-family:'Playfair Display',serif;font-size:4.2vw;font-weight:900;color:var(--ou);line-height:1;}
 #data-label{font-size:1.2vw;color:rgba(255,255,255,0.8);margin-top:0.2vh;white-space:nowrap;}
-#lua-label{font-size:1.1vw;color:rgba(255,255,255,0.9);margin-top:0.2vh;font-family:'Playfair Display',serif;font-weight:600;letter-spacing:0.05vw;}
+#lua-label{font-size:1.0vw;color:rgba(255,255,255,0.9);margin-top:0.1vh;font-family:'Playfair Display',serif;font-weight:600;letter-spacing:0.05vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:18vw;}
 
 /* CORPO */
 #corpo{display:flex;flex:1;overflow:hidden;}
 
 /* ESQUERDA */
-#painel-esq{width:57vw;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;}
+#painel-esq{width:50vw;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;}
 #aviso-area{flex:1;padding:3vh 4vw;display:flex;flex-direction:column;justify-content:center;position:relative;}
 #aviso-area::before{content:'';position:absolute;top:0;left:3vw;right:3vw;height:2px;background:linear-gradient(90deg,transparent,var(--ou),transparent);}
 #aviso-icone{font-size:5vh;margin-bottom:1vh;line-height:1}
@@ -77,16 +77,16 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--az1);color:v
 
 #noticias-tag{font-size:1vw;font-weight:600;letter-spacing:0.3vw;text-transform:uppercase;color:var(--ou);margin-bottom:0.8vh;flex-shrink:0;}
 #noticias-lista-multi{flex:1;display:flex;flex-direction:column;gap:0.6vh;overflow:hidden;}
-.n-item{display:flex;align-items:center;gap:1.2vw;padding:0.8vh 1.2vw;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.18);border-radius:6px;flex:1;overflow:hidden;}
+.n-item{display:flex;align-items:center;gap:1.2vw;padding:0.6vh 1.2vw;background:rgba(255,255,255,0.04);border:1px solid rgba(201,168,76,0.18);border-radius:6px;flex:1;overflow:hidden;min-height:0;}
 .n-logo{flex-shrink:0;width:5.5vw;height:3.5vh;object-fit:contain;border-radius:3px;}
-.n-titulo{font-family:'Arial',sans-serif;font-size:1.25vw;color:var(--br);line-height:1.3;font-weight:700;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+.n-titulo{font-family:'Arial',sans-serif;font-size:1.1vw;color:var(--br);line-height:1.25;font-weight:700;flex:1;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 #noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--ou),var(--oul,#e8c96a));box-shadow:0 0 6px var(--ou);transition:width linear;flex-shrink:0;margin-top:0.6vh;}
 
 /* FRASE */
 #frase-box{flex:1;padding:1.5vh 2.5vw;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);overflow:hidden;}
 .frase-icone{font-size:3vh;margin-bottom:1vh;opacity:.7;}
-#frase-texto{font-family:'Playfair Display',serif;font-size:2.2vw;font-weight:600;line-height:1.4;color:#f0ead8;font-style:italic;}
-#frase-autor{margin-top:0.8vh;font-size:1.2vw;color:var(--muted);}
+#frase-texto{font-family:'Playfair Display',serif;font-size:1.6vw;font-weight:600;line-height:1.4;color:#f0ead8;font-style:italic;}
+#frase-autor{margin-top:0.8vh;font-size:1.0vw;color:var(--muted);}
 
 /* ANIVERSÁRIOS */
 
