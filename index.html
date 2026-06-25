@@ -290,10 +290,34 @@ function atualizarRelogio(){
   const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   document.getElementById('data-label').textContent=`${dias[agora.getDay()]}, ${agora.getDate()} de ${meses[agora.getMonth()]}`;
   
-  // Cálculo simples de fase lunar
-  const fases=['Nova','Crescente','Cheia','Minguante'];
-  const lua=fases[Math.floor((agora.getDate() % 30) / 7.5) % 4];
-  document.getElementById('lua-label').textContent=`🌙 Fase Lunar: ${lua}`;
+  // Cálculo Astronômico da Fase Lunar (Algoritmo de Conway/Meton)
+  function getMoonPhase(year, month, day) {
+    let c = 0, e = 0, jd = 0, b = 0;
+    if (month < 3) { year--; month += 12; }
+    month++;
+    c = 365.25 * year;
+    e = 30.6 * month;
+    jd = c + e + day - 694039.09; // Julian date reference
+    jd /= 29.5305882; // Lunar month
+    b = parseInt(jd);
+    jd -= b;
+    b = Math.round(jd * 8);
+    if (b >= 8) b = 0;
+    
+    const fases = [
+      'Lua Nova', 
+      'Lua Crescente', 
+      'Quarto Crescente', 
+      'Crescente Gibosa', 
+      'Lua Cheia', 
+      'Minguante Gibosa', 
+      'Quarto Minguante', 
+      'Lua Minguante'
+    ];
+    return fases[b];
+  }
+  const lua = getMoonPhase(agora.getFullYear(), agora.getMonth() + 1, agora.getDate());
+  document.getElementById('lua-label').textContent=`🌙 ${lua}`;
 }
 
 /* CLIMA */
