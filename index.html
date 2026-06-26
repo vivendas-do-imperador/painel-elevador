@@ -6,7 +6,6 @@
 <title>Painel — Vivendas do Imperador</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-/* === CSS ORIGINAL MANTIDO + CORREÇÕES === */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--az0:#060e18;--az1:#0d1b2a;--az2:#142238;--ou:#c9a84c;--oul:#e8c96a;--br:#f0ead8;--muted:rgba(240,234,216,0.4);--verde:#2ecc71;--vermelho:#e74c3c;}
 html,body{width:100vw;height:100vh;overflow:hidden;background:var(--az1);color:var(--br);font-family:'Inter',sans-serif;}
@@ -23,26 +22,14 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--az1);color:v
 #data-label{font-size:1.2vw;color:rgba(255,255,255,0.8);margin-top:0.2vh;white-space:nowrap;}
 #lua-label{font-size:1.0vw;color:rgba(255,255,255,0.9);margin-top:0.1vh;font-family:'Playfair Display',serif;font-weight:600;letter-spacing:0.05vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:18vw;position:absolute;bottom:-1.8vh;right:0;background:rgba(0,0,0,0.5);padding:0 0.6vw;border-radius:3px;}
 
-/* CORPO */
-#corpo{display:flex;flex:1;overflow:hidden;}
-#painel-esq{width:50vw;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden;}
-#aviso-area{flex:1;padding:3vh 4vw;display:flex;flex-direction:column;justify-content:center;position:relative;}
-#aviso-area::before{content:'';position:absolute;top:0;left:3vw;right:3vw;height:2px;background:linear-gradient(90deg,transparent,var(--ou),transparent);}
-#aviso-icone{font-size:5vh;margin-bottom:1vh;line-height:1}
-#aviso-tag{font-family:'Playfair Display',serif;font-size:1.6vw;font-weight:700;letter-spacing:0.4vw;text-transform:uppercase;color:var(--ou);margin-bottom:1.2vh;display:flex;align-items:center;gap:0.8vw;}
-#aviso-tag::before{content:'';width:1.5vw;height:2px;background:var(--ou);}
-#aviso-titulo{font-family:'Playfair Display',serif;font-size:6vw;font-weight:900;line-height:1.05;color:#fff;margin-bottom:1.2vh;}
-#aviso-texto{font-size:1.9vw;line-height:1.6;color:rgba(255,255,255,.85);font-weight:300;white-space:pre-line;}
-#progresso-aviso{height:4px;width:0%;background:var(--ou);box-shadow:0 0 8px var(--ou);transition:width linear;flex-shrink:0;}
-
 /* TICKER */
 #ticker-bar{height:5.5vh;flex-shrink:0;display:flex;align-items:center;overflow:hidden;background:var(--az0);border-top:2px solid var(--ou);}
-#ticker-label{background:var(--ou);color:var(--az0);font-family:'Playfair Display',serif;font-weight:900;font-size:1.65vw;padding:0 1.8vw;height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.2vw;}
-#ticker-scroll{flex:1;overflow:hidden;height:100%;}
-#ticker-text{white-space:nowrap;font-size:1.85vw;font-weight:500;color:#fff;animation:ticker 55s linear infinite;display:inline-block;padding-left:100%;}
+#ticker-label{background:var(--ou);color:var(--az0);font-family:'Playfair Display',serif;font-weight:900;font-size:1.65vw;padding:0 1.9vw;height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);}
+#ticker-scroll{flex:1;overflow:hidden;height:100%;position:relative;}
+#ticker-text{white-space:nowrap;font-size:1.9vw;font-weight:500;color:#fff;display:inline-block;padding-left:120%;animation:ticker 50s linear infinite;}
 @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
 
-#reload-status{position:fixed;bottom:6vh;right:0.5vw;font-size:0.7vw;color:rgba(255,193,7,0.4);font-family:'Playfair Display',serif;z-index:999;text-align:right;pointer-events:none;transition:color 1s}
+#reload-status{position:fixed;bottom:6vh;right:0.8vw;font-size:0.75vw;color:rgba(255,193,7,0.5);font-family:'Playfair Display',serif;z-index:999;}
 </style>
 </head>
 <body>
@@ -62,42 +49,53 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--az1);color:v
   </div>
 
   <div id="corpo">
-    <!-- ESQUERDA - AVISO -->
     <div id="painel-esq">
       <div id="aviso-area">
         <div id="aviso-icone">📢</div>
         <div id="aviso-tag">AVISO IMPORTANTE</div>
-        <div id="aviso-titulo">Bem-vindo!</div>
-        <div id="aviso-texto">Painel de Comunicação do Condomínio Vivendas do Imperador.</div>
-        <div id="progresso-aviso"></div>
+        <div id="aviso-titulo">Carregando...</div>
+        <div id="aviso-texto">Sincronizando informações da planilha...</div>
       </div>
     </div>
-
-    <!-- DIREITA - Outros módulos (clima, mercado, etc.) -->
-    <div id="painel-dir">
-      <!-- Você pode preencher aqui depois com clima, notícias, frase, etc. -->
-    </div>
+    <div id="painel-dir"></div>
   </div>
 
-  <!-- TICKER -->
   <div id="ticker-bar">
     <div id="ticker-label">INFORMAÇÕES</div>
-    <div id="ticker-scroll"><div id="ticker-text"></div></div>
+    <div id="ticker-scroll"><div id="ticker-text">Carregando dados da planilha...</div></div>
   </div>
 </div>
 
 <div id="reload-status">⟳ verificando...</div>
 
 <script>
-// Configuração da planilha
+// ==================== SUA URL DA PLANILHA ====================
 const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR7LIajehR7ILfrKuQvQBuwIT7c70FbSrm0FSJ9CXRiSlnawZJzSdCd73QpYpVWeuBDfIVFRNNvDqKN/pub';
+
 const GID_TICKER = '798329129';
 
 async function fetchCSV(gid) {
   try {
     const url = `${CSV_BASE}?gid=${gid}&output=csv`;
-    const r = await fetch(url, {cache: 'no-store'});
-    const text = await r.text();
+    let text = null;
+
+    // Tentativa direta
+    try {
+      const r = await fetch(url, {cache: 'no-store'});
+      if (r.ok) text = await r.text();
+    } catch(e){}
+
+    // Proxy se falhar
+    if (!text) {
+      try {
+        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+        const r = await fetch(proxyUrl);
+        if (r.ok) text = await r.text();
+      } catch(e){}
+    }
+
+    if (!text) return [];
+
     const lines = text.split(/\r?\n/).filter(l => l.trim());
     return lines.slice(3).map(line => {
       const cols = [];
@@ -115,11 +113,16 @@ async function fetchCSV(gid) {
       cols.push(cur.trim());
       return cols;
     }).filter(row => row.length > 0 && row[0].trim() !== '');
-  } catch(e) { return []; }
+  } catch(e) {
+    console.error("Erro ao carregar CSV", e);
+    return [];
+  }
 }
 
 async function carregarTicker() {
   const rows = await fetchCSV(GID_TICKER);
+  console.log("🔍 Linhas do Ticker:", rows); // Debug
+
   const textos = rows
     .filter(r => String(r[1] || '').trim().toUpperCase() === 'SIM')
     .map(r => String(r[0] || '').trim())
@@ -128,15 +131,18 @@ async function carregarTicker() {
   const el = document.getElementById('ticker-text');
   if (!el) return;
 
-  const conteudo = textos.length ? textos.join('   •   ') : "Administração: seg a sex 09h-18h • Portaria 24h • Emergência: ligue para a portaria";
-  el.textContent = conteudo + '   •   ' + conteudo;
+  if (textos.length === 0) {
+    el.textContent = " Administração: seg a sex 09h-18h • Portaria 24h • Emergência: ligue para a portaria ";
+  } else {
+    const conteudo = textos.join('   •   ');
+    el.textContent = conteudo + '   •   ' + conteudo;
+  }
 
   el.style.animation = 'none';
   void el.offsetWidth;
-  el.style.animation = `ticker ${Math.max(50, conteudo.length * 0.38)}s linear infinite`;
+  el.style.animation = `ticker ${Math.max(45, textos.join('').length * 0.4)}s linear infinite`;
 }
 
-// Auto reload GitHub
 function agendarReloadGitHub() {
   const el = document.getElementById('reload-status');
   async function check() {
