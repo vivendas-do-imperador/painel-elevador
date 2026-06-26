@@ -3,66 +3,780 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vivendas do Imperador — Painel de Avisos</title>
+<title>Vivendas do Imperador — Painel</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --azul:#0a0f1c;
-  --azul2:#111827;
-  --azul3:#1e2937;
-  --acc:#c9a84c; /* Dourado premium */
-  --br:#f1f5f9;
-  --muted:#94a3b8;
-  --verde:#34d399;
-  --vermelho:#f87171;
-}
-html,body{width:100vw;height:100vh;overflow:hidden;background:var(--azul2);color:var(--br);font-family:'Barlow',sans-serif;}
-#painel{width:100vw;height:100vh;display:flex;flex-direction:column;}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--azul:#0d1f2d;--azul2:#152b3d;--acc:#d4af37;--br:#fff;--muted:#8899aa;--verde:#2ecc71;--vermelho:#e74c3c}
+html,body{width:100vw;height:100vh;overflow:hidden;background:var(--azul2);color:var(--br);font-family:'Barlow',sans-serif}
+#painel{width:100vw;height:100vh;display:flex;flex-direction:column}
 
-/* HEADER */
-#header{height:12vh;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;background:var(--azul);border-bottom:4px solid var(--acc);position:relative;flex-shrink:0;}
-#logo-wrap img{height:9vh;object-fit:contain;}
-#header-center{position:absolute;left:50%;transform:translateX(-50%);text-align:center;}
-#header-center h1{font-family:'Barlow Condensed',sans-serif;font-size:3.2vw;font-weight:900;color:var(--acc);letter-spacing:0.4vw;text-transform:uppercase;}
-#header-center small{display:block;font-size:1.1vw;color:rgba(241,245,249,0.8);letter-spacing:0.25vw;}
+#header{height:12vh;display:flex;align-items:center;justify-content:space-between;padding:0 3vw;background:var(--azul);border-bottom:3px solid var(--acc);position:relative;flex-shrink:0}
+#logo-wrap img{height:8vh;object-fit:contain}
+#header-center{position:absolute;left:50%;transform:translateX(-50%);text-align:center}
+#header-center h1{font-family:'Barlow Condensed',sans-serif;font-size:3vw;font-weight:900;color:var(--acc);letter-spacing:.3vw;text-transform:uppercase;white-space:nowrap}
+#header-center small{display:block;font-size:1.2vw;color:rgba(255,255,255,.75);letter-spacing:.2vw;margin-top:.2vh}
+#relogio-wrap{text-align:right}
+#relogio{font-family:'Barlow Condensed',sans-serif;font-size:4.2vw;font-weight:900;color:var(--acc);line-height:1}
+#data-label{font-size:1.2vw;color:rgba(255,255,255,.8);margin-top:.2vh;white-space:nowrap}
+#lua-label{font-size:.85vw;color:rgba(255,255,255,.9);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.05vw;white-space:nowrap}
 
-/* resto do CSS mantido com ajustes de cores para tema Dark premium */
-#painel-dir{background:#0f172a;}
-/* ... (o resto do CSS original com pequenas melhorias de contraste) */
+#corpo{display:flex;flex:1;overflow:hidden}
+#painel-esq{width:57vw;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.1);position:relative;overflow:hidden}
+#aviso-area{flex:1;padding:3vh 4vw;display:flex;flex-direction:column;justify-content:center;position:relative}
+#aviso-area::before{content:'';position:absolute;top:0;left:3vw;right:3vw;height:2px;background:linear-gradient(90deg,transparent,var(--acc),transparent)}
+#aviso-icone{font-size:5vh;margin-bottom:1vh;line-height:1}
+#aviso-tag{font-family:'Barlow Condensed',sans-serif;font-size:1.6vw;font-weight:700;letter-spacing:.4vw;text-transform:uppercase;color:var(--acc);margin-bottom:1.2vh;display:flex;align-items:center;gap:.8vw}
+#aviso-tag::before{content:'';width:1.5vw;height:2px;background:var(--acc)}
+#aviso-titulo{font-family:'Barlow Condensed',sans-serif;font-size:6vw;font-weight:900;line-height:1.05;color:#fff;margin-bottom:1.2vh}
+#aviso-texto{font-size:2.2vw;line-height:1.6;color:rgba(255,255,255,.85);font-weight:300}
+#progresso-aviso{height:4px;width:0%;background:var(--acc);box-shadow:0 0 8px var(--acc);transition:width .1s linear;flex-shrink:0}
+
+#feriado-badge{display:none;position:absolute;top:1vh;right:1.5vw;background:rgba(212,175,55,.15);border:1px solid var(--acc);border-radius:6px;padding:.4vh 1vw;font-family:'Barlow Condensed',sans-serif;font-size:1.1vw;color:var(--acc);font-weight:700;letter-spacing:.1vw;z-index:5}
+
+#player-video-wrap{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:100;background:#000}
+#player-video-wrap video{width:100%;height:100%;object-fit:contain}
+.btn-fechar-video{position:fixed;top:2vh;right:2vw;background:rgba(212,175,55,.9);border:none;color:#000;border-radius:50%;width:5vh;height:5vh;cursor:pointer;font-size:2.5vh;z-index:101;font-weight:bold}
+
+#painel-dir{flex:1;display:flex;flex-direction:column;background:#0a1a28;overflow:hidden}
+
+#clima-box{padding:1.5vh 2vw;border-bottom:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.15);flex-shrink:0}
+#clima-tag{font-family:'Barlow Condensed',sans-serif;font-size:1vw;font-weight:700;letter-spacing:.3vw;text-transform:uppercase;color:var(--acc);margin-bottom:.8vh}
+#clima-main{display:flex;align-items:center;gap:1.2vw}
+#clima-icone{font-size:4vh;line-height:1}
+#clima-temp{font-family:'Barlow Condensed',sans-serif;font-size:5vh;font-weight:900;color:var(--acc);line-height:1}
+#clima-temp sup{font-size:2.2vh;vertical-align:top;margin-top:.4vh}
+#clima-info h3{font-family:'Barlow Condensed',sans-serif;font-size:2.2vh;color:#fff;margin-bottom:.2vh}
+#clima-info p{font-size:1.6vh;color:rgba(255,255,255,.8)}
+
+#mercado-box{padding:1.2vh 2vw;border-bottom:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.12);flex-shrink:0}
+#mercado-tag{font-family:'Barlow Condensed',sans-serif;font-size:1vw;font-weight:700;letter-spacing:.3vw;text-transform:uppercase;color:var(--acc);margin-bottom:.8vh}
+#mercado-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.6vw}
+.mercado-item{background:rgba(255,255,255,.04);border:1px solid rgba(212,175,55,.2);border-radius:5px;padding:.8vh .5vw;text-align:center}
+.mercado-nome{font-family:'Barlow Condensed',sans-serif;font-size:.85vw;font-weight:700;letter-spacing:.1vw;text-transform:uppercase;color:var(--acc);margin-bottom:.2vh}
+.mercado-valor{font-family:Arial,sans-serif;font-size:1.85vh;font-weight:900;color:#fff;line-height:1.1}
+.mercado-var{font-family:'Barlow Condensed',sans-serif;font-size:1.5vh;font-weight:700;margin-top:.2vh}
+.mercado-var.up{color:var(--verde)}
+.mercado-var.down{color:var(--vermelho)}
+.mercado-var.neu{color:var(--muted)}
+
+#noticias-box{padding:1.2vh 2vw;border-bottom:1px solid rgba(255,255,255,.12);flex-shrink:0;position:relative;background:rgba(0,0,0,.2);overflow:hidden;min-height:0}
+#noticias-box::before{content:'';position:absolute;top:0;left:1.5vw;right:1.5vw;height:1px;background:linear-gradient(90deg,transparent,var(--acc),transparent)}
+#noticias-tag{font-family:'Barlow Condensed',sans-serif;font-size:1vw;font-weight:700;letter-spacing:.35vw;text-transform:uppercase;color:var(--acc);margin-bottom:.6vh;display:flex;align-items:center;gap:.5vw}
+#noticias-logo{height:2.2vh;object-fit:contain;flex-shrink:0;border-radius:2px}
+#noticias-titulo{font-family:'Barlow Condensed',sans-serif;font-size:1.35vw;font-weight:700;color:#fff;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:.4vh}
+#noticias-progresso{height:2px;width:0%;background:linear-gradient(90deg,var(--acc),#fff);box-shadow:0 0 6px var(--acc);transition:width .1s linear;margin-top:.6vh}
+
+#frase-box{flex:1;padding:1.5vh 2.5vw;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);overflow:hidden}
+.frase-icone{font-size:3vh;margin-bottom:1vh;opacity:.7}
+#frase-texto{font-family:'Barlow Condensed',sans-serif;font-size:1.7vw;font-weight:600;line-height:1.3;color:#f0ead8;font-style:italic}
+#frase-autor{margin-top:.8vh;font-size:1.2vw;color:var(--muted)}
+
+#aniv-box{padding:1.2vh 2vw;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.lateral-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1vw;font-weight:700;letter-spacing:.3vw;text-transform:uppercase;color:var(--muted);margin-bottom:.8vh}
+.aniv-item{display:flex;align-items:center;gap:.6vw;padding:.4vh 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:1.3vw;color:#fff}
+.aniv-item:last-child{border:none}
+.aniv-dia{background:var(--acc);color:var(--azul);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:1.1vw;padding:2px 6px;border-radius:4px;min-width:4vw;text-align:center}
+
+#midia-box{padding:1vh 1.5vw;background:#061220;display:flex;align-items:center;gap:.8vw;flex-wrap:wrap;flex-shrink:0}
+.midia-title{font-family:'Barlow Condensed',sans-serif;font-size:1.1vw;font-weight:700;letter-spacing:.2vw;text-transform:uppercase;color:var(--acc);white-space:nowrap}
+.btn-midia{padding:.4vh 1vw;border-radius:5px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--muted);font-size:1.1vw;font-family:'Barlow Condensed',sans-serif;font-weight:700;cursor:pointer}
+.btn-midia:hover{background:var(--acc);border-color:var(--acc);color:var(--azul)}
+.midia-url-wrap{display:flex;gap:.4vw;flex:1}
+#midia-url-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:.4vh .7vw;color:#fff;font-size:1.1vw;outline:none}
+#midia-url-input:focus{border-color:var(--acc)}
+.btn-tocar{padding:.4vh 1.2vw;background:var(--acc);border:none;border-radius:5px;color:var(--azul);font-weight:700;font-size:1.1vw;cursor:pointer}
+.midia-status{font-size:1vw;color:var(--muted)}
+.midia-status.tocando{color:#34d399}
+#player-audio{display:none}
+
+#ticker-bar{height:5.5vh;flex-shrink:0;display:flex;align-items:center;overflow:hidden;background:var(--azul);border-top:2px solid #1d3d57}
+#reload-status{position:fixed;bottom:6vh;right:.5vw;font-size:.7vw;color:rgba(212,175,55,.4);font-family:'Barlow Condensed',sans-serif;z-index:999;text-align:right;pointer-events:none;transition:color 1s}
+#ticker-label{background:var(--acc);color:var(--azul);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:1.6vw;padding:0 1.8vw;height:100%;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;clip-path:polygon(0 0,calc(100% - 1vw) 0,100% 50%,calc(100% - 1vw) 100%,0 100%);padding-right:2.2vw}
+#ticker-scroll{flex:1;overflow:hidden;height:100%}
+#ticker-text{white-space:nowrap;font-size:1.8vw;font-weight:500;color:#fff;animation:ticker 60s linear infinite;display:inline-block;padding-left:100%}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+#fk-status{position:fixed;top:4px;right:8px;font-size:10px;color:rgba(255,255,255,.4);z-index:200}
 </style>
 </head>
 <body>
+<div id="fk-status">⚙</div>
 <div id="painel">
   <div id="header">
-    <div id="logo-wrap">
-      <img id="logo-img" src="https://i.imgur.com/SEU_LINK_DA_LOGO_IMPERADOR.png" alt="Vivendas do Imperador"> <!-- Substitua pelo link da logo -->
-    </div>
+    <div id="logo-wrap"><img id="logo-img" src="data:image/png;base64,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" alt="Vivendas do Imperador"></div>
     <div id="header-center">
-      <h1>VIVENDAS DO IMPERADOR</h1>
-      <small>Painel de Comunicação Interna</small>
+      <h1>Vivendas do Imperador</h1>
+      <small>Painel de Comunicação &amp; Informações</small>
     </div>
     <div id="relogio-wrap">
       <div id="relogio">00:00</div>
       <div id="data-label">—</div>
+      <div id="lua-label"></div>
     </div>
   </div>
 
-  <!-- O resto do corpo (aviso, clima, notícias, aniversários etc.) mantido igual, só com ajustes visuais -->
-  <!-- ... -->
+  <div id="corpo">
+    <div id="painel-esq">
+      <div id="feriado-badge"></div>
+      <div id="aviso-area">
+        <div id="aviso-icone">🏛️</div>
+        <div id="aviso-tag">Avisos &amp; Comunicados</div>
+        <div id="aviso-titulo">Carregando...</div>
+        <div id="aviso-texto"></div>
+      </div>
+      <div id="progresso-aviso"></div>
+    </div>
+
+    <div id="painel-dir">
+      <div id="clima-box">
+        <div id="clima-tag">✦ Previsão do Tempo · Nova Iguaçu, RJ</div>
+        <div id="clima-main">
+          <div id="clima-icone">🌤️</div>
+          <div id="clima-temp">--<sup>°C</sup></div>
+          <div id="clima-info">
+            <h3 id="clima-desc">Carregando...</h3>
+            <p id="clima-detalhes"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="mercado-box">
+        <div id="mercado-tag">✦ Mercado Financeiro</div>
+        <div id="mercado-grid">
+          <div class="mercado-item"><div class="mercado-nome">USD/BRL</div><div class="mercado-valor" id="v-dolar">--</div><div class="mercado-var neu" id="var-dolar">--</div></div>
+          <div class="mercado-item"><div class="mercado-nome">EUR/BRL</div><div class="mercado-valor" id="v-euro">--</div><div class="mercado-var neu" id="var-euro">--</div></div>
+          <div class="mercado-item"><div class="mercado-nome">Bitcoin</div><div class="mercado-valor" id="v-btc">--</div><div class="mercado-var neu" id="var-btc">--</div></div>
+          <div class="mercado-item"><div class="mercado-nome">Ibovespa</div><div class="mercado-valor" id="v-ibov">--</div><div class="mercado-var neu" id="var-ibov">--</div></div>
+          <div class="mercado-item"><div class="mercado-nome">Ouro/oz</div><div class="mercado-valor" id="v-ouro">--</div><div class="mercado-var neu" id="var-ouro">--</div></div>
+        </div>
+      </div>
+
+      <div id="noticias-box">
+        <div id="noticias-tag">✦ Notícias do Dia</div>
+        <img id="noticias-logo" src="" alt="">
+        <div id="noticias-titulo">Carregando notícias...</div>
+        <div id="noticias-progresso"></div>
+      </div>
+
+      <div id="frase-box">
+        <div class="frase-icone">💡</div>
+        <div id="frase-texto">Carregando...</div>
+        <div id="frase-autor"></div>
+      </div>
+
+      <div id="aniv-box">
+        <div class="lateral-title">🎂 Aniversariantes</div>
+        <div id="aniversarios-lista"><div style="font-size:1.2vw;color:var(--muted)">Nenhum aniversariante hoje</div></div>
+      </div>
+
+      <div id="midia-box">
+        <div class="midia-title">🎵 Mídia</div>
+        <button class="btn-midia" onclick="tocarRadio()">📻 JB FM</button>
+        <button class="btn-midia" onclick="tocarTupi()">📻 Tupi</button>
+        <button class="btn-midia" id="btn-parar" onclick="pararTudo()" style="display:none">⏹ Parar</button>
+        <div class="midia-url-wrap">
+          <input id="midia-url-input" type="text" placeholder="YouTube, Drive ou MP4...">
+          <button class="btn-tocar" onclick="tocarURL()">▶ Tocar</button>
+        </div>
+        <div class="midia-status" id="midia-status">Parado</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ticker-bar">
+    <div id="ticker-label">📡 AVISO</div>
+    <div id="ticker-scroll"><div id="ticker-text">Bem-vindo ao Vivendas do Imperador!</div></div>
+  </div>
+
+  <div id="reload-status">⟳ aguardando...</div>
+  <div id="player-video-wrap">
+    <button class="btn-fechar-video" onclick="fecharVideo()">✕</button>
+    <div id="player-video-inner" style="width:100%;height:100%;"></div>
+  </div>
 </div>
+<audio id="player-audio"></audio>
 
 <script>
-// Configurações principais (substitua os GIDs pelos da sua nova planilha)
-const CSV_BASE = "https://docs.google.com/spreadsheets/d/SUA_NOVA_PLANILHA_ID/pub?output=csv";
-const GID_AVISOS = "0";
-const GID_TICKER = "123456789";
-const GID_FRASES = "987654321";
-const GID_ANIVERSARIOS = "111222333";
-// etc.
+// ============================================================
+// CONFIGURAÇÕES — VOCÊ DEVE SUBSTITUIR PELOS DADOS DA SUA PLANILHA
+// ============================================================
+const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/SEU_ID_AQUI/pub?output=csv';
+const GID_AVISOS = '0';
+const GID_TICKER = '0';
+const GID_FRASES = '0';
+const GID_ANIVERSARIOS = '0';
+const GID_CONTROLE = '0';
+const GID_PROGRAMACAO = '0';
 
-document.getElementById('logo-img').src = 'https://seusite.com/logo-imperador.png'; // Logo principal
-// ... resto do script mantido
+const SYNC_INTERVAL = 5 * 60 * 1000;
+const TEMPO_AVISO = 10000;
+const JBFM_STREAM = 'https://27613.live.streamtheworld.com/JBFMAAC.aac';
+const TUPI_STREAM = 'https://8923.brasilstream.com.br/stream?origem=site';
+const CLIMA_LAT = -22.7592;
+const CLIMA_LON = -43.4511;
+const CLIMA_INT = 600000;
+const MERCADO_INT = 120000;
+const NOTICIAS_INT = 600000;
+
+const WMO_IC = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',80:'🌦️',81:'🌦️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+const WMO_DC = {0:'Céu limpo',1:'Predo. limpo',2:'Parc. nublado',3:'Nublado',45:'Nevoeiro',48:'Nevoeiro',51:'Garoa fraca',53:'Garoa moderada',55:'Garoa densa',61:'Chuva fraca',63:'Chuva moderada',65:'Chuva forte',80:'Pancadas fracas',81:'Pancadas moderadas',82:'Pancadas fortes',95:'Trovoadas',96:'Trovoadas',99:'Trovoadas'};
+
+// ============================================================
+// ESTADO
+// ============================================================
+let radioAtiva = false;
+let videoAtivo = false;
+let avisos = [];
+let avisoIdx = 0;
+let avisoTimer = null;
+let todasNoticias = [];
+let noticiaIdx = 0;
+let noticiaTimer = null;
+const TEMPO_NOTICIA = 8000;
+
+const FONTE_LOGOS = {
+  'G1': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAyCAYAAACqNX6+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAU3SURBVHhe7ZtJSB1NEMdLDYIXc1OJCwiC8eASYlBE3G/qwYN6CLiBBkU8iAdvLhcXUEFJSA7iWcUEQfQmggvuC6gHQUFxwyAe1IjKc76usZ7O+PrNzHu+J81H/6BIdXe1pfPvnq6ZIT4KAyTC4Ev/SgRBCiIYUhDBkIIIhhREMKQggiEFEQwpiGBIQQRDCiIYUhDBkIKIBr5cNMLHxwdfPnrVKisrKZsjvHhP27dv3yibHpvNxo33tFVXV1NGRZE7RDCkIIIhBREMKYhgmH4x9PPzg4eHB2rpKS4uho8fP1LrmdPTU9jf34fJyUm4u7ujXudUVVXBr1+/qKWHFRXkOeKp/OxQh58/f1LrGbw0vr7W12xoaCjExMRAbGwsBAYGwvn5OczOzsLa2hpF8KmpqYHv378/NlAQI4yqrJGREYriwy6MUlFRwZ2rNXerrD9//lAUH8xfVlbGnas1Z1UWW4jc+JeWlJSkLC8v0yxH9vb2lPDwcO5cNCYIRVqosoxWqNEYEhwcDP39/ZCWlkY9fMx+jrtg/oGBAUhNTaUe12DXhzznNDY2wtzcHHz+/Jl6HImMjIQPHz5QyxFtHlNBjH4p7VhWVpZ6YdGCgoJgfn6eRgC+fv1KHh8rf7gZGRkZuvwLCws0Yp7fGWa3q/Lycmhra3uKOzs7g4aGBoiOjlb7cEG0trbCzs6OOu4MbR6P7RCt//fvX2hqaqLW40o1wiiHO2D+lpYWagGEhISQ5zn8/f2hvb2dWgDb29uQkJAAXV1dqgC4yFAgvA54rmxublKkMaaCuEtcXBx5AOz+St7bgQernaWlJfJcw2jn4m0Yd6KdgoICODk5oZYeLIqur6+p5Yg2j8d2SGlpqboacNXMzMxAZ2en2r+6ugrd3d2q7wxP7BB2eOvyd3R0qP0rKyvQ09Oj+p4kOTmZPICtrS3T25JlmDqGsPsbyse1379/UxQfrFLYoae8e/eOO99urOylGY7w4u1mVmVZze9OldXb20tRijI6OsqNsWouVVlW2djYgKmpqSe7vLxUVz4eej9+/KAo77G+vq7Lf3V19ZS/r6+PolyDXR/yHLm5uSHv8Tx5Dbo8qiwGWN0hrMrSjbEyT9nd3aVRRYmPj9eNa80TOyQ9PV03xh7SnvLjSmdnmm5ca+7skPr6eopSlKOjI26MVfPKDnnJ8fExMMGo9VgWvyXsIgETTPVxp3g6Pz6B28FnjJKSEmq9DlNBmGjkOaId48VhGWjn379/5DlilOM1aPMbVTnugM85WOraYWcKpKSkUOuZ9+/fQ21tLWRmZlKPMaaCaB9aXqId+/TpE7Dbhmr4bgZ3R05OjjqG75PGx8dVn4dRDqvgxdfmx92RnZ2tjmH+iYkJ1fckdXV1YLPZVB8v/PT0NAwPD6vVHlaWi4uL6vssPMMiIiLUOFPY6jTkNVUWcnt7qxQVFXHn281bVRbCDl+lsLCQO99ur3mXxZ4/lIuLC5rhHPZYwJ2P5tIZwmLIc8Ro7P7+HgYHB4Ed5jA0NES9fIx+jrvY8+POxVXrLXAnRkVFqe/sDg4OqPcR3B1jY2PqTsLfxRKoihHsQHxS0lsm6jd1KzvkpQUEBChfvnxRwsLCuOM8e5Mq6/8Auz7kWQefT/BVzeHhIfWYo80jBREMKYhgSEEEw/SbOn5XcOde6gr4tS0/P59aepqbm8nzHomJiZCXl0etZ/Dv1n5X8RasCIDc3FzVl/8tWjDkLUswpCCCIQURDCmIYEhBBEMKIhhSEMGQggiGFEQwpCBCAfAfC+mLxqgt8DUAAAAASUVORK5CYII=',
+  'UOL': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAyCAYAAACqNX6+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAU3SURBVHhe7ZtJSB1NEMdLDYIXc1OJCwiC8eASYlBE3G/qwYN6CLiBBkU8iAdvLhcXUEFJSA7iWcUEQfQmggvuC6gHQUFxwyAe1IjKc76usZ7O+PrNzHu+J81H/6BIdXe1pfPvnq6ZIT4KAyTC4Ev/SgRBCiIYUhDBkIIIhhREMKQggiEFEQwpiGBIQQRDCiIYUhDBkIKIBr5cNMLHxwdfPnrVKisrKZsjvHhP27dv3yibHpvNxo33tFVXV1NGRZE7RDCkIIIhBREMKYhgmH4x9PPzg4eHB2rpKS4uho8fP1LrmdPTU9jf34fJyUm4u7ujXudUVVXBr1+/qKWHFRXkOeKp/OxQh58/f1LrGbw0vr7W12xoaCjExMRAbGwsBAYGwvn5OczOzsLa2hpF8KmpqYHv378/NlAQI4yqrJGREYriwy6MUlFRwZ2rNXerrD9//lAUH8xfVlbGnas1Z1UWW4jc+JeWlJSkLC8v0yxH9vb2lPDwcO5cNCYIRVqosoxWqNEYEhwcDP39/ZCWlkY9fMx+jrtg/oGBAUhNTaUe12DXhzznNDY2wtzcHHz+/Jl6HImMjIQPHz5QyxFtHlNBjH4p7VhWVpZ6YdGCgoJgfn6eRgC+fv1KHh8rf7gZGRkZuvwLCws0Yp7fGWa3q/Lycmhra3uKOzs7g4aGBoiOjlb7cEG0trbCzs6OOu4MbR6P7RCt//fvX2hqaqLW40o1wiiHO2D+lpYWagGEhISQ5zn8/f2hvb2dWgDb29uQkJAAXV1dqgC4yFAgvA54rmxublKkMaaCuEtcXBx5AOz+St7bgQernaWlJfJcw2jn4m0Yd6KdgoICODk5oZYeLIqur6+p5Yg2j8d2SGlpqboacNXMzMxAZ2en2r+6ugrd3d2q7wxP7BB2eOvyd3R0qP0rKyvQ09Oj+p4kOTmZPICtrS3T25JlmDqGsPsbyse1379/UxQfrFLYoae8e/eOO99urOylGY7w4u1mVmVZze9OldXb20tRijI6OsqNsWouVVlW2djYgKmpqSe7vLxUVz4eej9+/KAo77G+vq7Lf3V19ZS/r6+PolyDXR/yHLm5uSHv8Tx5Dbo8qiwGWN0hrMrSjbEyT9nd3aVRRYmPj9eNa80TOyQ9PV03xh7SnvLjSmdnmm5ca+7skPr6eopSlKOjI26MVfPKDnnJ8fExMMGo9VgWvyXsIgETTPVxp3g6Pz6B28FnjJKSEmq9DlNBmGjkOaId48VhGWjn379/5DlilOM1aPMbVTnugM85WOraYWcKpKSkUOuZ9+/fQ21tLWRmZlKPMaaCaB9aXqId+/TpE7Dbhmr4bgZ3R05OjjqG75PGx8dVn4dRDqvgxdfmx92RnZ2tjmH+iYkJ1fckdXV1YLPZVB8v/PT0NAwPD6vVHlaWi4uL6vssPMMiIiLUOFPY6jTkNVUWcnt7qxQVFXHn281bVRbCDl+lsLCQO99ur3mXxZ4/lIuLC5rhHPZYwJ2P5tIZwmLIc8Ro7P7+HgYHB4Ed5jA0NES9fIx+jrvY8+POxVXrLXAnRkVFqe/sDg4OqPcR3B1jY2PqTsLfxRKoihHsQHxS0lsm6jd1KzvkpQUEBChfvnxRwsLCuOM8e5Mq6/8Auz7kWQefT/BVzeHhIfWYo80jBREMKYhgSEEEw/SbOn5XcOde6gr4tS0/P59aepqbm8nzHomJiZCXl0etZ/Dv1n5X8RasCIDc3FzVl/8tWjDkLUswpCCCIQURDCmIYEhBBEMKIhhSEMGQggiGFEQwpCBCAfAfC+mLxqgt8DUAAAAASUVORK5CYII=',
+  'BBC': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAyCAYAAACqNX6+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAU3SURBVHhe7ZtJSB1NEMdLDYIXc1OJCwiC8eASYlBE3G/qwYN6CLiBBkU8iAdvLhcXUEFJSA7iWcUEQfQmggvuC6gHQUFxwyAe1IjKc76usZ7O+PrNzHu+J81H/6BIdXe1pfPvnq6ZIT4KAyTC4Ev/SgRBCiIYUhDBkIIIhhREMKQggiEFEQwpiGBIQQRDCiIYUhDBkIKIBr5cNMLHxwdfPnrVKisrKZsjvHhP27dv3yibHpvNxo33tFVXV1NGRZE7RDCkIIIhBREMKYhgmH4x9PPzg4eHB2rpKS4uho8fP1LrmdPTU9jf34fJyUm4u7ujXudUVVXBr1+/qKWHFRXkOeKp/OxQh58/f1LrGbw0vr7W12xoaCjExMRAbGwsBAYGwvn5OczOzsLa2hpF8KmpqYHv378/NlAQI4yqrJGREYriwy6MUlFRwZ2rNXerrD9//lAUH8xfVlbGnas1Z1UWW4jc+JeWlJSkLC8v0yxH9vb2lPDwcO5cNCYIRVqosoxWqNEYEhwcDP39/ZCWlkY9fMx+jrtg/oGBAUhNTaUe12DXhzznNDY2wtzcHHz+/Jl6HImMjIQPHz5QyxFtHlNBjH4p7VhWVpZ6YdGCgoJgfn6eRgC+fv1KHh8rf7gZGRkZuvwLCws0Yp7fGWa3q/Lycmhra3uKOzs7g4aGBoiOjlb7cEG0trbCzs6OOu4MbR6P7RCt//fvX2hqaqLW40o1wiiHO2D+lpYWagGEhISQ5zn8/f2hvb2dWgDb29uQkJAAXV1dqgC4yFAgvA54rmxublKkMaaCuEtcXBx5AOz+St7bgQernaWlJfJcw2jn4m0Yd6KdgoICODk5oZYeLIqur6+p5Yg2j8d2SGlpqboacNXMzMxAZ2en2r+6ugrd3d2q7wxP7BB2eOvyd3R0qP0rKyvQ09Oj+p4kOTmZPICtrS3T25JlmDqGsPsbyse1379/UxQfrFLYoae8e/eOO99urOylGY7w4u1mVmVZze9OldXb20tRijI6OsqNsWouVVlW2djYgKmpqSe7vLxUVz4eej9+/KAo77G+vq7Lf3V19ZS/r6+PolyDXR/yHLm5uSHv8Tx5Dbo8qiwGWN0hrMrSjbEyT9nd3aVRRYmPj9eNa80TOyQ9PV03xh7SnvLjSmdnmm5ca+7skPr6eopSlKOjI26MVfPKDnnJ8fExMMGo9VgWvyXsIgETTPVxp3g6Pz6B28FnjJKSEmq9DlNBmGjkOaId48VhGWjn379/5DlilOM1aPMbVTnugM85WOraYWcKpKSkUOuZ9+/fQ21tLWRmZlKPMaaCaB9aXqId+/TpE7Dbhmr4bgZ3R05OjjqG75PGx8dVn4dRDqvgxdfmx92RnZ2tjmH+iYkJ1fckdXV1YLPZVB8v/PT0NAwPD6vVHlaWi4uL6vssPMMiIiLUOFPY6jTkNVUWcnt7qxQVFXHn281bVRbCDl+lsLCQO99ur3mXxZ4/lIuLC5rhHPZYwJ2P5tIZwmLIc8Ro7P7+HgYHB4Ed5jA0NES9fIx+jrvY8+POxVXrLXAnRkVFqe/sDg4OqPcR3B1jY2PqTsLfxRKoihHsQHxS0lsm6jd1KzvkpQUEBChfvnxRwsLCuOM8e5Mq6/8Auz7kWQefT/BVzeHhIfWYo80jBREMKYhgSEEEw/SbOn5XcOde6gr4tS0/P59aepqbm8nzHomJiZCXl0etZ/Dv1n5X8RasCIDc3FzVl/8tWjDkLUswpCCCIQURDCmIYEhBBEMKIhhSEMGQggiGFEQwpCBCAfAfC+mLxqgt8DUAAAAASUVORK5CYII=',
+  'CNN': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAyCAYAAACqNX6+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAU3SURBVHhe7ZtJSB1NEMdLDYIXc1OJCwiC8eASYlBE3G/qwYN6CLiBBkU8iAdvLhcXUEFJSA7iWcUEQfQmggvuC6gHQUFxwyAe1IjKc76usZ7O+PrNzHu+J81H/6BIdXe1pfPvnq6ZIT4KAyTC4Ev/SgRBCiIYUhDBkIIIhhREMKQggiEFEQwpiGBIQQRDCiIYUhDBkIKIBr5cNMLHxwdfPnrVKisrKZsjvHhP27dv3yibHpvNxo33tFVXV1NGRZE7RDCkIIIhBREMKYhgmH4x9PPzg4eHB2rpKS4uho8fP1LrmdPTU9jf34fJyUm4u7ujXudUVVXBr1+/qKWHFRXkOeKp/OxQh58/f1LrGbw0vr7W12xoaCjExMRAbGwsBAYGwvn5OczOzsLa2hpF8KmpqYHv378/NlAQI4yqrJGREYriwy6MUlFRwZ2rNXerrD9//lAUH8xfVlbGnas1Z1UWW4jc+JeWlJSkLC8v0yxH9vb2lPDwcO5cNCYIRVqosoxWqNEYEhwcDP39/ZCWlkY9fMx+jrtg/oGBAUhNTaUe12DXhzznNDY2wtzcHHz+/Jl6HImMjIQPHz5QyxFtHlNBjH4p7VhWVpZ6YdGCgoJgfn6eRgC+fv1KHh8rf7gZGRkZuvwLCws0Yp7fGWa3q/Lycmhra3uKOzs7g4aGBoiOjlb7cEG0trbCzs6OOu4MbR6P7RCt//fvX2hqaqLW40o1wiiHO2D+lpYWagGEhISQ5zn8/f2hvb2dWgDb29uQkJAAXV1dqgC4yFAgvA54rmxublKkMaaCuEtcXBx5AOz+St7bgQernaWlJfJcw2jn4m0Yd6KdgoICODk5oZYeLIqur6+p5Yg2j8d2SGlpqboacNXMzMxAZ2en2r+6ugrd3d2q7wxP7BB2eOvyd3R0qP0rKyvQ09Oj+p4kOTmZPICtrS3T25JlmDqGsPsbyse1379/UxQfrFLYoae8e/eOO99urOylGY7w4u1mVmVZze9OldXb20tRijI6OsqNsWouVVlW2djYgKmpqSe7vLxUVz4eej9+/KAo77G+vq7Lf3V19ZS/r6+PolyDXR/yHLm5uSHv8Tx5Dbo8qiwGWN0hrMrSjbEyT9nd3aVRRYmPj9eNa80TOyQ9PV03xh7SnvLjSmdnmm5ca+7skPr6eopSlKOjI26MVfPKDnnJ8fExMMGo9VgWvyXsIgETTPVxp3g6Pz6B28FnjJKSEmq9DlNBmGjkOaId48VhGWjn379/5DlilOM1aPMbVTnugM85WOraYWcKpKSkUOuZ9+/fQ21tLWRmZlKPMaaCaB9aXqId+/TpE7Dbhmr4bgZ3R05OjjqG75PGx8dVn4dRDqvgxdfmx92RnZ2tjmH+iYkJ1fckdXV1YLPZVB8v/PT0NAwPD6vVHlaWi4uL6vssPMMiIiLUOFPY6jTkNVUWcnt7qxQVFXHn281bVRbCDl+lsLCQO99ur3mXxZ4/lIuLC5rhHPZYwJ2P5tIZwmLIc8Ro7P7+HgYHB4Ed5jA0NES9fIx+jrvY8+POxVXrLXAnRkVFqe/sDg4OqPcR3B1jY2PqTsLfxRKoihHsQHxS0lsm6jd1KzvkpQUEBChfvnxRwsLCuOM8e5Mq6/8Auz7kWQefT/BVzeHhIfWYo80jBREMKYhgSEEEw/SbOn5XcOde6gr4tS0/P59aepqbm8nzHomJiZCXl0etZ/Dv1n5X8RasCIDc3FzVl/8tWjDkLUswpCCCIQURDCmIYEhBBEMKIhhSEMGQggiGFEQwpCBCAfAfC+mLxqgt8DUAAAAASUVORK5CYII='
+};
+
+// ============================================================
+// FUNÇÕES AUXILIARES
+// ============================================================
+function setStatus(msg, tocando = false) {
+  const el = document.getElementById('midia-status');
+  el.textContent = msg;
+  el.className = 'midia-status' + (tocando ? ' tocando' : '');
+  document.getElementById('btn-parar').style.display = tocando ? 'inline-block' : 'none';
+}
+
+function pararAudio() {
+  const a = document.getElementById('player-audio');
+  a.pause();
+  a.src = '';
+  radioAtiva = false;
+}
+
+function pararTudo() {
+  pararAudio();
+  fecharVideoSemRetomar();
+  setStatus('Parado');
+}
+
+function tocarTupi() {
+  pararTudo();
+  const a = document.getElementById('player-audio');
+  a.src = TUPI_STREAM;
+  a.load();
+  a.play().then(() => {
+    radioAtiva = true;
+    setStatus('Tupi RJ ao vivo', true);
+  }).catch(() => {
+    setTimeout(() => {
+      a.play().then(() => {
+        radioAtiva = true;
+        setStatus('Tupi RJ ao vivo', true);
+      }).catch(() => setStatus('Tupi — clique para tocar'));
+    }, 3000);
+  });
+}
+
+function tocarRadio() {
+  pararTudo();
+  const a = document.getElementById('player-audio');
+  a.src = JBFM_STREAM;
+  a.load();
+  a.play().then(() => {
+    radioAtiva = true;
+    setStatus('JB FM ao vivo', true);
+  }).catch(() => {
+    setTimeout(() => {
+      a.play().then(() => {
+        radioAtiva = true;
+        setStatus('JB FM ao vivo', true);
+      }).catch(() => setStatus('JB FM — clique para tocar'));
+    }, 3000);
+  });
+}
+
+function tocarURL() {
+  const url = document.getElementById('midia-url-input').value.trim();
+  if (url) _tocarUrlInterna(url);
+}
+
+function _tocarUrlInterna(url) {
+  if (radioAtiva) pararAudio();
+  if (isYoutube(url)) { abrirYoutubeExterno(url); return; }
+  url = converterDriveUrl(url);
+  if (/\.(mp3|aac|ogg|wav|m4a)$/.test(url)) { tocarAudioUrl(url); }
+  else if (/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(url)) { exibirImagem(url); }
+  else { tocarVideoArquivo(url); }
+}
+
+function isYoutube(url) {
+  return url.includes('youtube.com') || url.includes('youtu.be');
+}
+
+function converterDriveUrl(url) {
+  const m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  return m ? 'https://drive.google.com/uc?export=download&id=' + m[1] : url;
+}
+
+function abrirYoutubeExterno(url) {
+  const m1 = url.match(/[?&]v=([^&]+)/);
+  const m2 = url.match(/youtu\.be\/([^?]+)/);
+  const m3 = url.match(/\/live\/([^?]+)/);
+  const id = (m1 && m1[1]) || (m2 && m2[1]) || (m3 && m3[1]) || null;
+  const embedUrl = id ? 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1' : url;
+  const wrap = document.getElementById('player-video-wrap');
+  const inner = document.getElementById('player-video-inner');
+  inner.innerHTML = '<iframe src="' + embedUrl + '" style="width:100%;height:100%;border:none;background:#000" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+  wrap.style.display = 'block';
+  videoAtivo = true;
+  setStatus('YouTube tocando', true);
+}
+
+function exibirImagem(url) {
+  const wrap = document.getElementById('player-video-wrap');
+  const inner = document.getElementById('player-video-inner');
+  inner.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:contain;background:#000" onclick="fecharVideo()">';
+  wrap.style.display = 'block';
+  videoAtivo = true;
+  setStatus('Imagem exibida', true);
+}
+
+function tocarAudioUrl(url) {
+  const a = document.getElementById('player-audio');
+  a.src = url;
+  a.play().then(() => setStatus('Áudio tocando', true)).catch(() => setStatus('Erro no áudio'));
+}
+
+function tocarVideoArquivo(url) {
+  const inner = document.getElementById('player-video-inner');
+  inner.innerHTML = '<video src="' + url + '" autoplay controls style="width:100%;height:100%;object-fit:contain;background:#000"></video>';
+  document.getElementById('player-video-wrap').style.display = 'block';
+  videoAtivo = true;
+  setStatus('Vídeo tocando', true);
+}
+
+function fecharVideo() {
+  fecharVideoSemRetomar();
+}
+
+function fecharVideoSemRetomar() {
+  document.getElementById('player-video-wrap').style.display = 'none';
+  document.getElementById('player-video-inner').innerHTML = '';
+  videoAtivo = false;
+  if (!radioAtiva) setStatus('Parado');
+}
+
+// ============================================================
+// RELÓGIO E LUA
+// ============================================================
+function atualizarRelogio() {
+  const d = new Date();
+  document.getElementById('relogio').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+  const dias = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado'];
+  const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  document.getElementById('data-label').textContent = dias[d.getDay()] + ', ' + d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+function fasesDaLua() {
+  const now = new Date();
+  const known = new Date(2000, 0, 6, 18, 14, 0);
+  const diff = (now - known) / (1000 * 60 * 60 * 24);
+  const cycle = 29.53058867;
+  const phase = ((diff % cycle) + cycle) % cycle;
+  const icons = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
+  const names = ['Lua Nova', 'Lua Crescente', 'Quarto Crescente', 'Gibosa Crescente', 'Lua Cheia', 'Gibosa Minguante', 'Quarto Minguante', 'Lua Minguante'];
+  const i = Math.min(Math.floor((phase / cycle) * 8), 7);
+  document.getElementById('lua-label').textContent = icons[i] + ' ' + names[i];
+}
+
+// ============================================================
+// CLIMA
+// ============================================================
+async function fetchClima() {
+  try {
+    const r = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + CLIMA_LAT + '&longitude=' + CLIMA_LON + '&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,windspeed_10m&timezone=America%2FSao_Paulo');
+    const d = await r.json();
+    const cv = d.current;
+    document.getElementById('clima-icone').textContent = WMO_IC[cv.weathercode] || '🌡️';
+    document.getElementById('clima-temp').innerHTML = Math.round(cv.temperature_2m) + '<sup>°C</sup>';
+    document.getElementById('clima-desc').textContent = WMO_DC[cv.weathercode] || 'Variável';
+    document.getElementById('clima-detalhes').textContent = 'Sensação ' + Math.round(cv.apparent_temperature) + '°C  ·  Umidade ' + cv.relative_humidity_2m + '%  ·  Vento ' + Math.round(cv.windspeed_10m) + ' km/h';
+  } catch (e) {}
+}
+
+// ============================================================
+// MERCADO
+// ============================================================
+function setMercado(id, valor, variacao) {
+  document.getElementById('v-' + id).textContent = valor;
+  const el = document.getElementById('var-' + id);
+  if (variacao === null) { el.textContent = '—'; el.className = 'mercado-var neu'; return; }
+  const sinal = variacao >= 0 ? '▲' : '▼';
+  el.textContent = sinal + ' ' + Math.abs(variacao).toFixed(2) + '%';
+  el.className = 'mercado-var ' + (variacao >= 0 ? 'up' : 'down');
+}
+
+async function fetchMercado() {
+  try {
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,XAU-BRL');
+    const d = await r.json();
+    if (d.USDBRL) setMercado('dolar', 'R$ ' + parseFloat(d.USDBRL.bid).toFixed(2), parseFloat(d.USDBRL.pctChange));
+    if (d.EURBRL) setMercado('euro', 'R$ ' + parseFloat(d.EURBRL.bid).toFixed(2), parseFloat(d.EURBRL.pctChange));
+    if (d.XAUBRL) setMercado('ouro', 'R$ ' + Math.round(parseFloat(d.XAUBRL.bid)).toLocaleString('pt-BR'), parseFloat(d.XAUBRL.pctChange));
+  } catch (e) {}
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true');
+    const d = await r.json();
+    if (d.bitcoin) {
+      const v = d.bitcoin.brl;
+      const fmt = v >= 100000 ? 'R$ ' + Math.round(v / 1000) + 'K' : 'R$ ' + (v / 1000).toFixed(1) + 'K';
+      setMercado('btc', fmt, d.bitcoin.brl_24h_change);
+    }
+  } catch (e) {}
+  try {
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/IBOV-BRL');
+    const d = await r.json();
+    if (d && d.IBOVBRL) {
+      const v = parseFloat(d.IBOVBRL.bid);
+      setMercado('ibov', Math.round(v / 1000) + 'K pts', parseFloat(d.IBOVBRL.pctChange));
+    }
+  } catch (e) {}
+}
+
+// ============================================================
+// NOTÍCIAS
+// ============================================================
+const FEEDS = [
+  { nome: 'G1', url: 'https://g1.globo.com/rss/g1/' },
+  { nome: 'UOL', url: 'https://rss.uol.com.br/feed/noticias.xml' },
+  { nome: 'BBC', url: 'https://feeds.bbci.co.uk/portuguese/rss.xml' },
+  { nome: 'CNN', url: 'https://www.cnnbrasil.com.br/feed/' }
+];
+
+const PROXIES = [
+  u => 'https://api.allorigins.win/get?url=' + encodeURIComponent(u),
+  u => 'https://corsproxy.io/?' + encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(u)
+];
+
+const NOTICIAS_FALLBACK = [
+  { fonte: 'DICA', titulo: 'Mantenha o ambiente do condomínio sempre limpo e organizado.' },
+  { fonte: 'DICA', titulo: 'Respeite os horários de silêncio e as normas internas.' },
+  { fonte: 'AVISO', titulo: 'Confira os avisos do condomínio no painel ao lado.' },
+  { fonte: 'AVISO', titulo: 'Participe das assembleias e eventos do condomínio.' },
+  { fonte: 'INFO', titulo: 'Painel atualizado automaticamente a cada 10 minutos.' }
+];
+
+function parsearXML(text) {
+  const xml = new DOMParser().parseFromString(text, 'text/xml');
+  const items = xml.querySelectorAll('item');
+  const result = [];
+  items.forEach(item => {
+    const title = item.querySelector('title');
+    if (title && title.textContent) {
+      let t = title.textContent.trim().replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+      if (t && t.length > 5) result.push(t);
+    }
+  });
+  return result.slice(0, 3);
+}
+
+async function fetchRSS(feedUrl) {
+  for (const makeProxy of PROXIES) {
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 6000);
+      const r = await fetch(makeProxy(feedUrl), { signal: ctrl.signal });
+      clearTimeout(tid);
+      if (!r.ok) continue;
+      const text = await r.text();
+      let xmlText = text;
+      try { const j = JSON.parse(text); if (j.contents) xmlText = j.contents; } catch (e) {}
+      const titulos = parsearXML(xmlText);
+      if (titulos.length > 0) return titulos;
+    } catch (e) { continue; }
+  }
+  return [];
+}
+
+function mostrarNoticia(item) {
+  if (!item) return;
+  const logo = document.getElementById('noticias-logo');
+  const logoSrc = FONTE_LOGOS[item.fonte];
+  if (logoSrc) { logo.src = logoSrc; logo.style.display = 'block'; }
+  else { logo.src = ''; logo.style.display = 'none'; }
+  document.getElementById('noticias-titulo').textContent = item.titulo;
+  const b = document.getElementById('noticias-progresso');
+  b.style.transition = 'none';
+  b.style.width = '0%';
+  clearTimeout(noticiaTimer);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    b.style.transition = 'width ' + TEMPO_NOTICIA + 'ms linear';
+    b.style.width = '100%';
+  }));
+  noticiaTimer = setTimeout(proximaNoticia, TEMPO_NOTICIA);
+}
+
+function proximaNoticia() {
+  if (!todasNoticias.length) return;
+  noticiaIdx = (noticiaIdx + 1) % todasNoticias.length;
+  mostrarNoticia(todasNoticias[noticiaIdx]);
+}
+
+function mostrarNoticias(lista) {
+  if (!lista || !lista.length) {
+    document.getElementById('noticias-logo').style.display = 'none';
+    document.getElementById('noticias-titulo').textContent = 'Notícias indisponíveis no momento.';
+    return;
+  }
+  todasNoticias = lista;
+  noticiaIdx = 0;
+  mostrarNoticia(lista[0]);
+}
+
+async function carregarNoticias() {
+  const lista = [];
+  const resultados = await Promise.allSettled(
+    FEEDS.map(f => fetchRSS(f.url).then(ts => ts.map(t => ({ fonte: f.nome, titulo: t }))))
+  );
+  resultados.forEach(res => { if (res.status === 'fulfilled') res.value.forEach(i => lista.push(i)); });
+  if (!lista.length) { mostrarNoticias(NOTICIAS_FALLBACK); return; }
+  for (let i = lista.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [lista[i], lista[j]] = [lista[j], lista[i]]; }
+  mostrarNoticias(lista);
+}
+
+// ============================================================
+// FERIADOS
+// ============================================================
+async function verificarFeriado() {
+  try {
+    const ano = new Date().getFullYear();
+    const r = await fetch('https://brasilapi.com.br/api/feriados/v1/' + ano);
+    const feriados = await r.json();
+    const hoje = new Date();
+    const hj = hoje.toISOString().split('T')[0];
+    const amanha = new Date(hoje);
+    amanha.setDate(amanha.getDate() + 1);
+    const am = amanha.toISOString().split('T')[0];
+    const badge = document.getElementById('feriado-badge');
+    const ferHoje = feriados.find(f => f.date === hj);
+    const ferAmanha = feriados.find(f => f.date === am);
+    if (ferHoje) { badge.textContent = '🎉 Hoje: ' + ferHoje.name; badge.style.display = 'block'; }
+    else if (ferAmanha) { badge.textContent = '📅 Amanhã: ' + ferAmanha.name; badge.style.display = 'block'; }
+    else { badge.style.display = 'none'; }
+  } catch (e) {}
+}
+
+// ============================================================
+// CSV
+// ============================================================
+async function fetchCSV(gid) {
+  try {
+    const url = CSV_BASE + '&gid=' + gid + '&single=true';
+    let text = null;
+    try { const r = await fetch(url, { redirect: 'follow', cache: 'no-store' }); if (r.ok) text = await r.text(); } catch (e) {}
+    if (!text) { try { const r = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(url)); if (r.ok) text = await r.text(); } catch (e) {} }
+    if (!text) { try { const r = await fetch('https://corsproxy.io/?' + encodeURIComponent(url)); if (r.ok) text = await r.text(); } catch (e) {} }
+    if (!text) return [];
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) return [];
+    return lines.slice(3).map(line => {
+      const cols = [];
+      let cur = '',
+        inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"') { if (inQ && line[i + 1] === '"') { cur += '"'; i++; } else inQ = !inQ; } else if (c === ',' && !inQ) { cols.push(cur.trim()); cur = ''; } else cur += c;
+      }
+      cols.push(cur.trim());
+      return cols;
+    });
+  } catch (e) { return []; }
+}
+
+// ============================================================
+// AVISOS
+// ============================================================
+function mostrarAviso(a) {
+  if (!a) return;
+  document.getElementById('aviso-icone').textContent = a.icone || '📌';
+  document.getElementById('aviso-tag').textContent = a.tag || 'Aviso';
+  document.getElementById('aviso-titulo').textContent = a.titulo || '';
+  document.getElementById('aviso-texto').textContent = a.texto || '';
+  const b = document.getElementById('progresso-aviso');
+  b.style.transition = 'none';
+  b.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    b.style.transition = 'width ' + TEMPO_AVISO + 'ms linear';
+    b.style.width = '100%';
+  }));
+  clearTimeout(avisoTimer);
+  avisoTimer = setTimeout(() => {
+    avisoIdx = (avisoIdx + 1) % avisos.length;
+    mostrarAviso(avisos[avisoIdx]);
+  }, TEMPO_AVISO);
+}
+
+async function carregarAvisos() {
+  const rows = await fetchCSV(GID_AVISOS);
+  const lista = [];
+  rows.filter(r => r[0] && !r[0].startsWith('⚙')).forEach(r => {
+    const tipo = (r[2] || 'normal').toLowerCase();
+    const icones = { urgente: '⚠', info: '💡', ok: '✔', normal: '📌' };
+    const tags = { urgente: 'Urgente', info: 'Informativo', ok: 'Novidade', normal: 'Aviso' };
+    const titulo = (r[0] || '').replace(/^[^\w\s]+/, '').trim() || r[0];
+    lista.push({ titulo, texto: r[1] || '', icone: icones[tipo] || '📌', tag: tags[tipo] || 'Aviso' });
+  });
+  if (!lista.length) lista.push({ titulo: 'Bem-vindo!', texto: 'Painel de Comunicação do Vivendas do Imperador.', icone: '🏛️', tag: 'Aviso' });
+  avisos = lista;
+  clearTimeout(avisoTimer);
+  avisoIdx = 0;
+  mostrarAviso(avisos[0]);
+}
+
+// ============================================================
+// TICKER
+// ============================================================
+async function carregarTicker() {
+  const rows = await fetchCSV(GID_TICKER);
+  const textos = rows.map(r => r[0]).filter(Boolean);
+  if (!textos.length) return;
+  const el = document.getElementById('ticker-text');
+  el.textContent = [...textos, ...textos].join('   •   ');
+  el.style.animation = 'none';
+  el.offsetHeight;
+  el.style.animation = 'ticker ' + Math.max(90, textos.join('').length * 0.45) + 's linear infinite';
+}
+
+// ============================================================
+// FRASES
+// ============================================================
+const FRASES_FALLBACK = [
+  { frase: 'O sucesso é a soma de pequenos esforços repetidos dia após dia.', autor: 'Robert Collier' },
+  { frase: 'A cada dia, um novo começo.', autor: '' },
+  { frase: 'Segurança no trânsito começa com atitude responsável.', autor: '' },
+  { frase: 'Trabalho em equipe é o combustível que permite pessoas comuns atingirem resultados incomuns.', autor: '' },
+  { frase: 'A excelência não é um ato, mas um hábito.', autor: 'Aristóteles' }
+];
+
+let fraseIdx = 0;
+let fraseTimer = null;
+const TEMPO_FRASE = 12000;
+
+function mostrarFrase(f) {
+  document.getElementById('frase-texto').textContent = '"' + (f.frase || f[0] || '') + '"';
+  document.getElementById('frase-autor').textContent = (f.autor || f[1]) ? '— ' + (f.autor || f[1]) : '';
+}
+
+function proximaFrase(lista) {
+  fraseIdx = (fraseIdx + 1) % lista.length;
+  mostrarFrase(lista[fraseIdx]);
+  fraseTimer = setTimeout(() => proximaFrase(lista), TEMPO_FRASE);
+}
+
+async function carregarFrase() {
+  clearTimeout(fraseTimer);
+  const rows = await fetchCSV(GID_FRASES);
+  const lista = rows.length ? rows : FRASES_FALLBACK;
+  fraseIdx = Math.floor(Date.now() / (1000 * 60 * 60 * 24)) % lista.length;
+  mostrarFrase(lista[fraseIdx]);
+  fraseTimer = setTimeout(() => proximaFrase(lista), TEMPO_FRASE);
+}
+
+// ============================================================
+// ANIVERSÁRIOS
+// ============================================================
+async function carregarAniversarios() {
+  const rows = await fetchCSV(GID_ANIVERSARIOS);
+  const hoje = new Date();
+  const dH = String(hoje.getDate()).padStart(2, '0'),
+    mH = String(hoje.getMonth() + 1).padStart(2, '0');
+  const lista = rows.map(r => {
+    const p = (r[1] || '').split('/');
+    const dd = p[0],
+      mm = p[1];
+    if (!dd || !mm) return null;
+    const ano = hoje.getFullYear();
+    let aniv = new Date(ano, parseInt(mm) - 1, parseInt(dd));
+    const h = new Date(ano, parseInt(mH) - 1, parseInt(dH));
+    if (aniv < h) aniv.setFullYear(ano + 1);
+    return { nome: r[0], dd, mm, diff: Math.round((aniv - h) / (1000 * 60 * 60 * 24)) };
+  }).filter(Boolean).filter(a => a.diff <= 7).sort((a, b) => a.diff - b.diff);
+  const el = document.getElementById('aniversarios-lista');
+  if (!lista.length) { el.innerHTML = '<div style="font-size:1.2vw;color:var(--muted)">Nenhum aniversariante nos próximos 7 dias</div>'; return; }
+  el.innerHTML = lista.map(a => {
+    const cor = a.diff === 0 ? '#e85555' : 'var(--acc)';
+    return '<div class="aniv-item"><span class="aniv-dia" style="background:' + cor + '">' + (a.diff === 0 ? 'HOJE' : a.dd + '/' + a.mm) + '</span><span>' + a.nome + '</span>' + (a.diff === 0 ? ' 🎂' : '') + '</div>';
+  }).join('');
+}
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+async function sincronizar() {
+  await carregarAvisos();
+  await carregarTicker();
+  await carregarFrase();
+  await carregarAniversarios();
+}
+
+function initFully() {
+  document.getElementById('fk-status').textContent = window.innerWidth + 'x' + window.innerHeight;
+  if (typeof fully !== 'undefined') {
+    document.getElementById('fk-status').style.color = '#34d399';
+    fully.setFullScreen(true);
+    fully.turnScreenOn();
+  }
+}
+
+// Inicialização
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
+fasesDaLua();
+
+fetchClima();
+setInterval(fetchClima, CLIMA_INT);
+fetchMercado();
+setInterval(fetchMercado, MERCADO_INT);
+carregarNoticias();
+setInterval(carregarNoticias, NOTICIAS_INT);
+verificarFeriado();
+
+// Auto iniciar rádio
+setTimeout(() => {
+  const audio = document.getElementById('player-audio');
+  audio.src = JBFM_STREAM;
+  audio.load();
+  audio.play().then(() => {
+    radioAtiva = true;
+    setStatus('JB FM ao vivo', true);
+  }).catch(() => {
+    setTimeout(() => {
+      audio.play().then(() => {
+        radioAtiva = true;
+        setStatus('JB FM ao vivo', true);
+      }).catch(() => {});
+    }, 3000);
+  });
+}, 1500);
+
+// Carregar dados
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initFully();
+    sincronizar();
+    setInterval(sincronizar, SYNC_INTERVAL);
+  });
+} else {
+  initFully();
+  sincronizar();
+  setInterval(sincronizar, SYNC_INTERVAL);
+}
 </script>
 </body>
 </html>
