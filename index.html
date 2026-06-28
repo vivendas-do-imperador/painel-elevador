@@ -475,7 +475,7 @@ async function verificarFeriado(){
 /* =========================================================
    CSV PARSER (Planilha Vivendas)
    ========================================================= */
-async function fetchCSV(gid){
+async function fetchCSV(gid,skip=4){
   try{
     const url=CSV_BASE+'&gid='+gid+'&single=true';let text=null;
     try{const r=await fetch(url,{redirect:'follow',cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}
@@ -484,7 +484,7 @@ async function fetchCSV(gid){
     if(!text)return[];
     const lines=text.split(/\r?\n/).filter(l=>l.trim());
     if(lines.length<2)return[];
-    return lines.slice(4).map(line=>{
+    return lines.slice(skip).map(line=>{
       const cols=[];let cur='',inQ=false;
       for(let i=0;i<line.length;i++){
         const c=line[i];
@@ -501,7 +501,7 @@ async function fetchCSV(gid){
    CONTROLE REMOTO — sem radio_on/off
    ========================================================= */
 async function verificarControle(){
-  const rows=await fetchCSV(GID_CONTROLE);
+  const rows=await fetchCSV(GID_CONTROLE,3);
   if(!rows.length)return;
   const linha=rows[0];
   if(!linha||!linha[0])return;
