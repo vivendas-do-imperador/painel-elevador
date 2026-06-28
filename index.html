@@ -362,11 +362,13 @@ async function fetchMercado(){
     }
   }catch(e){}
   try{
-    const r=await fetch('https://economia.awesomeapi.com.br/json/last/IBOV-BRL');
+    const r=await fetch('https://brapi.dev/api/quote/%5EBVSP?range=1d&interval=1d&fundamental=false');
     const d=await r.json();
-    if(d&&d.IBOVBRL){
-      const v=parseFloat(d.IBOVBRL.bid);
-      setMercado('ibov',Math.round(v/1000)+'K pts',parseFloat(d.IBOVBRL.pctChange));
+    if(d&&d.results&&d.results[0]){
+      const q=d.results[0];
+      const v=q.regularMarketPrice||0;
+      const pct=q.regularMarketChangePercent||0;
+      setMercado('ibov',Math.round(v/1000)+'K pts',pct);
     }
   }catch(e){}
 }
@@ -555,9 +557,11 @@ async function carregarAvisos(){
   const rows=await fetchCSV(GID_AVISOS);
   const lista=[];
   // Planilha: A=Título, B=Texto, C=Ícone(emoji), D=ATIVO(SIM/NÃO)
-  rows.filter(r=>r[0]&&!r[0].startsWith('⚙')).forEach(r=>{
-    const ativo=(r[3]||'SIM').trim().toUpperCase();
-    if(ativo==='NÃO'||ativo==='NAO')return;
+  rows.filter(r=>{
+    if(!r[0]||r[0].startsWith('⚙'))return false;
+    const ativo=(r[3]||'').trim().toUpperCase();
+    return ativo===''||ativo==='SIM';
+  }).forEach(r=>{
     const titulo=(r[0]||'').trim();
     const texto=(r[1]||'').trim();
     const icone=(r[2]||'📌').trim()||'📌';
@@ -576,8 +580,9 @@ async function carregarTicker(){
   const rows=await fetchCSV(GID_TICKER);
   // Planilha: A=Texto, B=ATIVO(SIM/NÃO)
   const textos=rows.filter(r=>{
-    const ativo=(r[1]||'SIM').trim().toUpperCase();
-    return r[0]&&ativo!=='NÃO'&&ativo!=='NAO';
+    if(!r[0])return false;
+    const ativo=(r[1]||'').trim().toUpperCase();
+    return ativo===''||ativo==='SIM';
   }).map(r=>r[0]).filter(Boolean);
   if(!textos.length)return;
   const el=document.getElementById('ticker-text');
@@ -616,8 +621,9 @@ async function carregarFrase(){
   const rows=await fetchCSV(GID_FRASES);
   // Planilha: A=Frase, B=Autor(opcional), C=ATIVO(SIM/NÃO)
   const filtradas=rows.filter(r=>{
-    const ativo=(r[2]||'SIM').trim().toUpperCase();
-    return r[0]&&ativo!=='NÃO'&&ativo!=='NAO';
+    if(!r[0])return false;
+    const ativo=(r[2]||'').trim().toUpperCase();
+    return ativo===''||ativo==='SIM';
   });
   const lista=filtradas.length?filtradas:FRASES_FALLBACK;
   fraseIdx=Math.floor(Date.now()/(1000*60*60*24))%lista.length;
@@ -631,7 +637,12 @@ async function carregarFrase(){
 async function carregarRegras(){
   const rows=await fetchCSV(GID_REGRAS);
   const el=document.getElementById('regras-lista');
-  const lista=rows.filter(r=>r[0]&&(r[3]||'SIM').toUpperCase()!=='NÃO'&&(r[3]||'SIM').toUpperCase()!=='NAO');
+  const lista=rows.filter(r=>{
+    if(!r[0]||r[0].startsWith('⚙'))return false;
+    const ativo=(r[3]||'').trim().toUpperCase();
+    // Aceita apenas SIM explícito ou campo vazio (não aceita "NÃO", "NAO" nem textos de cabeçalho)
+    return ativo===''||ativo==='SIM';
+  });
   if(!lista.length){el.innerHTML='<div style="font-size:1.2vw;color:var(--muted)">Nenhuma regra cadastrada</div>';return;}
   // Rotação: mostra 3 por vez, troca a cada ciclo
   const idx=Math.floor(Date.now()/30000)%Math.ceil(lista.length/3);
