@@ -554,12 +554,14 @@ function agendarProx(ms){clearTimeout(avisoTimer);avisoTimer=setTimeout(()=>{avi
 async function carregarAvisos(){
   const rows=await fetchCSV(GID_AVISOS);
   const lista=[];
+  // Planilha: A=Título, B=Texto, C=Ícone(emoji), D=ATIVO(SIM/NÃO)
   rows.filter(r=>r[0]&&!r[0].startsWith('⚙')).forEach(r=>{
-    const tipo=(r[2]||'normal').toLowerCase();
-    const icones={urgente:'⚠',info:'💡',ok:'✔',normal:'📌'};
-    const tags={urgente:'Urgente',info:'Informativo',ok:'Novidade',normal:'Aviso'};
-    const titulo=(r[0]||'').replace(/^[^\w\s]+/,'').trim()||r[0];
-    lista.push({titulo,texto:r[1]||'',icone:icones[tipo]||'📌',tag:tags[tipo]||'Aviso'});
+    const ativo=(r[3]||'SIM').trim().toUpperCase();
+    if(ativo==='NÃO'||ativo==='NAO')return;
+    const titulo=(r[0]||'').trim();
+    const texto=(r[1]||'').trim();
+    const icone=(r[2]||'📌').trim()||'📌';
+    lista.push({titulo,texto,icone,tag:'Aviso'});
   });
   if(!lista.length) lista.push({titulo:'Bem-vindo!',texto:'Painel de Comunicação do Condomínio Vivendas do Imperador.',icone:'👋',tag:'Aviso'});
   // Card do desenvolvedor ELS Grid
@@ -572,7 +574,11 @@ async function carregarAvisos(){
    ========================================================= */
 async function carregarTicker(){
   const rows=await fetchCSV(GID_TICKER);
-  const textos=rows.map(r=>r[0]).filter(Boolean);
+  // Planilha: A=Texto, B=ATIVO(SIM/NÃO)
+  const textos=rows.filter(r=>{
+    const ativo=(r[1]||'SIM').trim().toUpperCase();
+    return r[0]&&ativo!=='NÃO'&&ativo!=='NAO';
+  }).map(r=>r[0]).filter(Boolean);
   if(!textos.length)return;
   const el=document.getElementById('ticker-text');
   el.textContent=[...textos,...textos].join('   •   ');
@@ -608,7 +614,12 @@ function proximaFrase(lista){
 async function carregarFrase(){
   clearTimeout(fraseTimer);
   const rows=await fetchCSV(GID_FRASES);
-  const lista=rows.length?rows:FRASES_FALLBACK;
+  // Planilha: A=Frase, B=Autor(opcional), C=ATIVO(SIM/NÃO)
+  const filtradas=rows.filter(r=>{
+    const ativo=(r[2]||'SIM').trim().toUpperCase();
+    return r[0]&&ativo!=='NÃO'&&ativo!=='NAO';
+  });
+  const lista=filtradas.length?filtradas:FRASES_FALLBACK;
   fraseIdx=Math.floor(Date.now()/(1000*60*60*24))%lista.length;
   mostrarFrase(lista[fraseIdx]);
   fraseTimer=setTimeout(()=>proximaFrase(lista),TEMPO_FRASE);
