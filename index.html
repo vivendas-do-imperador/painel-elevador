@@ -475,7 +475,7 @@ async function verificarFeriado(){
 /* =========================================================
    CSV PARSER (Planilha Vivendas)
    ========================================================= */
-async function fetchCSV(gid,skip=4){
+async function fetchCSV(gid,skip=3){
   try{
     const url=CSV_BASE+'&gid='+gid+'&single=true';let text=null;
     try{const r=await fetch(url,{redirect:'follow',cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}
