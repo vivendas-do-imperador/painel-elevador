@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YT Player</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;width:100vw;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+iframe{width:100vw;height:100vh;border:none;}
+#msg{color:#fff;font-family:sans-serif;font-size:2vw;text-align:center;}
+</style>
+</head>
+<body>
+<div id="msg">Carregando...</div>
+<script>
+// Pega a URL passada como parâmetro ?url=
+const params = new URLSearchParams(window.location.search);
+const rawUrl = params.get('url') || '';
+
+function extrairIdYoutube(url) {
+  const m1 = url.match(/[?&]v=([^&]+)/);
+  const m2 = url.match(/youtu\.be\/([^?]+)/);
+  const m3 = url.match(/\/live\/([^?]+)/);
+  const m4 = url.match(/\/shorts\/([^?]+)/);
+  return (m1&&m1[1]) || (m2&&m2[1]) || (m3&&m3[1]) || (m4&&m4[1]) || null;
+}
+
+function voltar() {
+  // Fecha esse browser e retorna ao painel principal no Fully Kiosk
+  if (typeof fully !== 'undefined') {
+    try { fully.closeAllBrowsers(); } catch(e) {}
+    try { fully.loadStartURL(); } catch(e) {}
+  } else {
+    window.history.back();
+  }
+}
+
+if (!rawUrl) {
+  document.getElementById('msg').textContent = 'URL não informada.';
+  setTimeout(voltar, 3000);
+} else {
+  const id = extrairIdYoutube(rawUrl);
+  if (id) {
+    // Embed via iframe
+    const embedUrl = 'https://www.youtube-nocookie.com/embed/' + id
+      + '?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&playsinline=1';
+    document.body.innerHTML = '<iframe src="' + embedUrl
+      + '" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>';
+  } else {
+    // URL direta (não é youtube padrão) — redireciona
+    document.getElementById('msg').textContent = 'Redirecionando...';
+    window.location.replace(rawUrl);
+  }
+}
+</script>
+</body>
+</html>
