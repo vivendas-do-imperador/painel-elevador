@@ -185,12 +185,6 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--azul2);color
         <div id="frase-autor"></div>
       </div>
 
-      <!-- ANIVERSÁRIOS -->
-      <div id="regras-box">
-        <div class="lateral-title">📋 Regras & Normas</div>
-        <div id="regras-lista"><div style="font-size:1.2vw;color:var(--muted)">Carregando regras...</div></div>
-      </div>
-
       <!-- MÍDIA — sem botões de rádio -->
       <div id="midia-box">
         <div class="midia-title">🎬 Mídia</div>
@@ -555,7 +549,7 @@ function agendarProx(ms){clearTimeout(avisoTimer);avisoTimer=setTimeout(()=>{avi
 
 async function carregarAvisos(){
   const rows=await fetchCSV(GID_AVISOS);
-  const lista=[];
+  const listaAvisos=[];
   // Planilha: A=Título, B=Texto, C=Ícone(emoji), D=ATIVO(SIM/NÃO)
   rows.filter(r=>{
     if(!r[0]||r[0].startsWith('⚙'))return false;
@@ -565,9 +559,28 @@ async function carregarAvisos(){
     const titulo=(r[0]||'').trim();
     const texto=(r[1]||'').trim();
     const icone=(r[2]||'📌').trim()||'📌';
-    lista.push({titulo,texto,icone,tag:'Aviso'});
+    listaAvisos.push({titulo,texto,icone,tag:'Aviso'});
   });
-  if(!lista.length) lista.push({titulo:'Bem-vindo!',texto:'Painel de Comunicação do Condomínio Vivendas do Imperador.',icone:'👋',tag:'Aviso'});
+  if(!listaAvisos.length) listaAvisos.push({titulo:'Bem-vindo!',texto:'Painel de Comunicação do Condomínio Vivendas do Imperador.',icone:'👋',tag:'Aviso'});
+
+  // Carregar regras para intercalar
+  const rowsR=await fetchCSV(GID_REGRAS);
+  const listaRegras=[];
+  rowsR.filter(r=>{
+    if(!r[0]||r[0].startsWith('⚙'))return false;
+    const ativo=(r[3]||'').trim().toUpperCase();
+    return ativo===''||ativo==='SIM';
+  }).forEach(r=>{
+    listaRegras.push({titulo:(r[0]||'').trim(),texto:(r[1]||'').trim(),icone:(r[2]||'📋').trim()||'📋',tag:'Regras & Normas'});
+  });
+
+  // Intercalar: aviso, regra, aviso, regra...
+  const lista=[];
+  const max=Math.max(listaAvisos.length,listaRegras.length);
+  for(let i=0;i<max;i++){
+    if(i<listaAvisos.length) lista.push(listaAvisos[i]);
+    if(i<listaRegras.length) lista.push(listaRegras[i]);
+  }
   // Card do desenvolvedor ELS Grid
   lista.push({titulo:'ELS Grid',texto:'Tecnologia  ·  Informes  ·  Produções\n\n✉️  elsgrid@gmail.com\n(21) 97269-0650',icone:'🖥️',tag:'Desenvolvedor deste Painel'});
   avisos=lista;clearTimeout(avisoTimer);avisoIdx=0;mostrarAviso(avisos[0]);
@@ -635,24 +648,7 @@ async function carregarFrase(){
    ANIVERSÁRIOS
    ========================================================= */
 async function carregarRegras(){
-  const rows=await fetchCSV(GID_REGRAS);
-  const el=document.getElementById('regras-lista');
-  const lista=rows.filter(r=>{
-    if(!r[0]||r[0].startsWith('⚙'))return false;
-    const ativo=(r[3]||'').trim().toUpperCase();
-    // Aceita apenas SIM explícito ou campo vazio (não aceita "NÃO", "NAO" nem textos de cabeçalho)
-    return ativo===''||ativo==='SIM';
-  });
-  if(!lista.length){el.innerHTML='<div style="font-size:1.2vw;color:var(--muted)">Nenhuma regra cadastrada</div>';return;}
-  // Rotação: mostra 3 por vez, troca a cada ciclo
-  const idx=Math.floor(Date.now()/30000)%Math.ceil(lista.length/3);
-  const slice=lista.slice(idx*3,(idx*3)+3);
-  el.innerHTML=slice.map(r=>{
-    const icone=r[2]||'📌';
-    const titulo=r[0]||'';
-    const texto=r[1]||'';
-    return '<div class="regra-item"><span class="regra-icone">'+icone+'</span><span><strong>'+titulo+'</strong>'+(texto?' — '+texto:'')+'</span></div>';
-  }).join('');
+  // Regras agora intercaladas nos avisos via carregarAvisos()
 }
 
 /* =========================================================
