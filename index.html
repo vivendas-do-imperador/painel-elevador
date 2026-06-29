@@ -20,7 +20,7 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--azul2);color
 #relogio-wrap{text-align:right;}
 #relogio{font-family:'Barlow Condensed',sans-serif;font-size:4.2vw;font-weight:900;color:var(--acc);line-height:1;}
 #data-label{font-size:1.2vw;color:rgba(255,255,255,0.8);margin-top:0.2vh;white-space:nowrap;}
-#lua-label{font-size:0.85vw;color:rgba(255,255,255,0.9);margin-top:0;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:0.05vw;white-space:nowrap;overflow:hidden;}
+#lua-label{font-size:1.4vw;color:rgba(255,255,255,0.9);margin-top:0;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:0.05vw;white-space:nowrap;overflow:hidden;}
 
 /* CORPO */
 #corpo{display:flex;flex:1;overflow:hidden;}
@@ -308,7 +308,7 @@ function fasesDaLua(){
   const icons=['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'];
   const names=['Lua Nova','Lua Crescente','Quarto Crescente','Gibosa Crescente','Lua Cheia','Gibosa Minguante','Quarto Minguante','Lua Minguante'];
   const i=Math.min(Math.floor((phase/cycle)*8),7);
-  document.getElementById('lua-label').textContent=icons[i]+' '+names[i];
+  document.getElementById('lua-label').textContent='LUA '+icons[i]+' '+names[i];
 }
 fasesDaLua();
 
