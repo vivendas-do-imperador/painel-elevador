@@ -749,12 +749,11 @@ verificarFeriado();
 function agendarReloadVivendas(){
   function calcularEspera(){
     const agora = new Date();
-    const gmt3 = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
-    const minutos = gmt3.getUTCMinutes();
-    const segundos = gmt3.getUTCSeconds();
-    const ms = gmt3.getUTCMilliseconds();
+    const minutos = agora.getMinutes();
+    const segundos = agora.getSeconds();
+    const ms = agora.getMilliseconds();
     const proximoMultiplo = Math.ceil((minutos + 0.001) / 5) * 5;
-    const minutosAte = proximoMultiplo - minutos;
+    const minutosAte = (proximoMultiplo >= 60 ? 60 : proximoMultiplo) - minutos;
     return (minutosAte * 60 * 1000) - (segundos * 1000) - ms;
   }
 
@@ -781,16 +780,16 @@ function agendarReloadVivendas(){
           sessionStorage.setItem('painelHashVivendas', novoHash);
           setReloadStatus('↻ atualizando...', '#2ecc71');
           setTimeout(()=>{ window.location.reload(true); }, 500);
+          return;
         } else {
           setReloadStatus('✓ ok ' + agora, 'rgba(255,193,7,0.4)');
         }
+        setTimeout(executarReload, calcularEspera());
       })
       .catch(e => {
         setReloadStatus('✗ erro ' + agora, 'rgba(231,76,60,0.6)');
         setTimeout(executarReload, 2 * 60 * 1000);
-        return;
       });
-    setTimeout(executarReload, calcularEspera());
   }
 
   setTimeout(executarReload, 30 * 1000);
