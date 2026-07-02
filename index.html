@@ -252,15 +252,8 @@ function mostrarNoticia(item){
   if(!item) return;
   const logo = document.getElementById('noticias-logo');
   const logoSrc = FONTE_LOGOS[item.fonte];
-  if(logoSrc){ 
-    logo.src=logoSrc; 
-    logo.style.display='block'; 
-    logo.style.height='2.2vh';
-  }
-  else { 
-    logo.src=''; 
-    logo.style.display='none'; 
-  }
+  if(logoSrc){ logo.src=logoSrc; logo.style.display='block'; }
+  else { logo.src=''; logo.style.display='none'; }
   document.getElementById('noticias-titulo').textContent=item.titulo;
   const b=document.getElementById('noticias-progresso');
   b.style.transition='none';b.style.width='0%';
@@ -370,8 +363,6 @@ async function fetchMercado(){
       const v=q.regularMarketPrice||0;
       const pct=q.regularMarketChangePercent||0;
       setMercado('ibov',Math.round(v/1000)+'K pts',pct);
-    } else {
-      setMercado('ibov','Fechado',null);
     }
   }catch(e){}
 }
