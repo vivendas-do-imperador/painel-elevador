@@ -330,19 +330,17 @@ function aplicarClima(codigo,temp,sensacao,umidade,vento){
 
 async function fetchClimaPrimario(){
   const url='https://api.open-meteo.com/v1/forecast?latitude='+CLIMA_LAT+'&longitude='+CLIMA_LON+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,windspeed_10m&timezone=America%2FSao_Paulo';
-  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),8000));
-  const r=await Promise.race([fetch(url),timeout]);
+  const r=await fetch(url);
   const d=await r.json();const cv=d.current;
   if(!cv||cv.temperature_2m==null) throw new Error('sem dados current');
   aplicarClima(cv.weathercode,cv.temperature_2m,cv.apparent_temperature,cv.relative_humidity_2m,cv.windspeed_10m);
 }
 
 // Formato legado da API, usado como reserva caso o formato atual (current=)
-// falhe silenciosamente nesse dispositivo/rede específico.
+// falhe de verdade (não por lentidão, apenas erro real de rede/resposta).
 async function fetchClimaLegado(){
   const url='https://api.open-meteo.com/v1/forecast?latitude='+CLIMA_LAT+'&longitude='+CLIMA_LON+'&current_weather=true&hourly=relative_humidity_2m,apparent_temperature&timezone=America%2FSao_Paulo';
-  const timeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),8000));
-  const r=await Promise.race([fetch(url),timeout]);
+  const r=await fetch(url);
   const d=await r.json();
   const cw=d.current_weather;
   if(!cw||cw.temperature==null) throw new Error('sem dados current_weather');
