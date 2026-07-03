@@ -242,7 +242,7 @@ let videoAtivo=false,ultimoControle='';
 let playlist=[],playlistIndex=0,modoPlaylist=false,fullyKiosk=null;
 let avisos=[],avisoIdx=0,avisoTimer=null;
 let todasNoticias=[],noticiaIdx=0,noticiaTimer=null;
-const TEMPO_NOTICIA=8000;
+const TEMPO_NOTICIA=14000;
 
 const FONTE_LOGOS = {
   'G1':     'data:image/png;base64,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',
@@ -341,6 +341,11 @@ function setMercado(id,valor,variacao){
   el.className='mercado-var '+(variacao>=0?'up':'down');
 }
 
+// A brapi.dev passou a exigir token para o índice ^BVSP (Ibovespa).
+// Crie uma conta gratuita em https://brapi.dev/dashboard (15.000 requisições/mês)
+// e cole seu token aqui para o Ibovespa voltar a funcionar:
+const BRAPI_TOKEN = '3bU1yFLHiLwVnTjDn4iMSu';
+
 async function fetchMercado(){
   try{
     const r=await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,XAU-BRL');
@@ -358,16 +363,19 @@ async function fetchMercado(){
       setMercado('btc',fmt,d.bitcoin.brl_24h_change);
     }
   }catch(e){}
-  try{
-    const r=await fetch('https://brapi.dev/api/quote/%5EBVSP?range=1d&interval=1d&fundamental=false');
-    const d=await r.json();
-    if(d&&d.results&&d.results[0]){
-      const q=d.results[0];
-      const v=q.regularMarketPrice||0;
-      const pct=q.regularMarketChangePercent||0;
-      setMercado('ibov',Math.round(v/1000)+'K pts',pct);
-    }
-  }catch(e){}
+  if(BRAPI_TOKEN){
+    try{
+      const url='https://brapi.dev/api/quote/%5EBVSP?range=1d&interval=1d&fundamental=false&token='+encodeURIComponent(BRAPI_TOKEN);
+      const r=await fetch(url);
+      const d=await r.json();
+      if(d&&d.results&&d.results[0]){
+        const q=d.results[0];
+        const v=q.regularMarketPrice||0;
+        const pct=q.regularMarketChangePercent||0;
+        setMercado('ibov',Math.round(v/1000)+'K pts',pct);
+      }
+    }catch(e){}
+  }
 }
 
 /* =========================================================
