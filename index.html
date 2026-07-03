@@ -328,10 +328,32 @@ function aplicarClima(codigo,temp,sensacao,umidade,vento){
   document.getElementById('clima-detalhes').textContent=partes.join('  ·  ');
 }
 
+// Busca JSON tentando direto primeiro; se falhar (bloqueio de CORS, rede etc.),
+// tenta pelos mesmos proxies que já funcionam para as notícias (PROXIES).
+async function fetchJSONComProxy(url){
+  try{
+    const r=await fetch(url);
+    if(r.ok) return await r.json();
+  }catch(e){}
+  for(const makeProxy of PROXIES){
+    try{
+      const r=await fetch(makeProxy(url));
+      if(!r.ok) continue;
+      const text=await r.text();
+      try{
+        const j=JSON.parse(text);
+        if(j&&j.contents) return JSON.parse(j.contents);
+        return j;
+      }catch(e){continue;}
+    }catch(e){continue;}
+  }
+  throw new Error('todas as tentativas de busca falharam');
+}
+
 async function fetchClimaPrimario(){
   const url='https://api.open-meteo.com/v1/forecast?latitude='+CLIMA_LAT+'&longitude='+CLIMA_LON+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weathercode,windspeed_10m&timezone=America%2FSao_Paulo';
-  const r=await fetch(url);
-  const d=await r.json();const cv=d.current;
+  const d=await fetchJSONComProxy(url);
+  const cv=d.current;
   if(!cv||cv.temperature_2m==null) throw new Error('sem dados current');
   aplicarClima(cv.weathercode,cv.temperature_2m,cv.apparent_temperature,cv.relative_humidity_2m,cv.windspeed_10m);
 }
@@ -340,8 +362,7 @@ async function fetchClimaPrimario(){
 // falhe de verdade (não por lentidão, apenas erro real de rede/resposta).
 async function fetchClimaLegado(){
   const url='https://api.open-meteo.com/v1/forecast?latitude='+CLIMA_LAT+'&longitude='+CLIMA_LON+'&current_weather=true&hourly=relative_humidity_2m,apparent_temperature&timezone=America%2FSao_Paulo';
-  const r=await fetch(url);
-  const d=await r.json();
+  const d=await fetchJSONComProxy(url);
   const cw=d.current_weather;
   if(!cw||cw.temperature==null) throw new Error('sem dados current_weather');
   const idx=(d.hourly&&d.hourly.time)?d.hourly.time.indexOf(cw.time):-1;
