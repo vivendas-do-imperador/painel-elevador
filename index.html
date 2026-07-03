@@ -342,9 +342,11 @@ function setMercado(id,valor,variacao){
 }
 
 // A brapi.dev passou a exigir token para o índice ^BVSP (Ibovespa).
-// Crie uma conta gratuita em https://brapi.dev/dashboard (15.000 requisições/mês)
-// e cole seu token aqui para o Ibovespa voltar a funcionar:
+// Chave gratuita: 15.000 requisições/mês. Como essa cota é compartilhada
+// por todos os painéis que usarem a mesma chave, o Ibovespa é atualizado
+// num intervalo próprio (IBOV_INT), mais espaçado que o resto do mercado.
 const BRAPI_TOKEN = '3bU1yFLHiLwVnTjDn4iMSu';
+const IBOV_INT = 20*60*1000; // 20 minutos
 
 async function fetchMercado(){
   try{
@@ -363,19 +365,21 @@ async function fetchMercado(){
       setMercado('btc',fmt,d.bitcoin.brl_24h_change);
     }
   }catch(e){}
-  if(BRAPI_TOKEN){
-    try{
-      const url='https://brapi.dev/api/quote/%5EBVSP?range=1d&interval=1d&fundamental=false&token='+encodeURIComponent(BRAPI_TOKEN);
-      const r=await fetch(url);
-      const d=await r.json();
-      if(d&&d.results&&d.results[0]){
-        const q=d.results[0];
-        const v=q.regularMarketPrice||0;
-        const pct=q.regularMarketChangePercent||0;
-        setMercado('ibov',Math.round(v/1000)+'K pts',pct);
-      }
-    }catch(e){}
-  }
+}
+
+async function fetchIbovespa(){
+  if(!BRAPI_TOKEN) return;
+  try{
+    const url='https://brapi.dev/api/quote/%5EBVSP?range=1d&interval=1d&fundamental=false&token='+encodeURIComponent(BRAPI_TOKEN);
+    const r=await fetch(url);
+    const d=await r.json();
+    if(d&&d.results&&d.results[0]){
+      const q=d.results[0];
+      const v=q.regularMarketPrice||0;
+      const pct=q.regularMarketChangePercent||0;
+      setMercado('ibov',Math.round(v/1000)+'K pts',pct);
+    }
+  }catch(e){}
 }
 
 /* =========================================================
@@ -751,6 +755,7 @@ setTimeout(async()=>{
 
 fetchClima(); setInterval(fetchClima,CLIMA_INT);
 fetchMercado(); setInterval(fetchMercado,MERCADO_INT);
+fetchIbovespa(); setInterval(fetchIbovespa,IBOV_INT);
 carregarNoticias(); setInterval(carregarNoticias,NOTICIAS_INT);
 verificarFeriado();
 
