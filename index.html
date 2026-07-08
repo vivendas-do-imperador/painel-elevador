@@ -544,10 +544,11 @@ async function verificarFeriado(){
    ========================================================= */
 async function fetchCSV(gid,skip=5){
   try{
-    const url=CSV_BASE+'&gid='+gid+'&single=true';let text=null;
+    const cb='&_cb='+Date.now();
+    const url=CSV_BASE+'&gid='+gid+'&single=true'+cb;let text=null;
     try{const r=await fetch(url,{redirect:'follow',cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}
-    if(!text){try{const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url));if(r.ok)text=await r.text();}catch(e){}}
-    if(!text){try{const r=await fetch('https://corsproxy.io/?'+encodeURIComponent(url));if(r.ok)text=await r.text();}catch(e){}}
+    if(!text){try{const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url)+cb,{cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}}
+    if(!text){try{const r=await fetch('https://corsproxy.io/?'+encodeURIComponent(url)+cb,{cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}}
     if(!text)return[];
     const lines=text.split(/\r?\n/).filter(l=>l.trim());
     if(lines.length<2)return[];
