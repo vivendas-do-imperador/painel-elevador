@@ -804,12 +804,8 @@ async function carregarAvisos(){
    ========================================================= */
 async function carregarTicker(){
   const rows=await fetchCSV(GID_TICKER,3);
-  // Planilha: A=Texto, B=ATIVO(SIM/NÃO)
-  const textos=rows.filter(r=>{
-    if(!r[0])return false;
-    const ativo=(r[1]||'').trim().toUpperCase();
-    return ativo===''||ativo==='SIM';
-  }).map(r=>r[0]).filter(Boolean);
+  // Planilha: A=Texto (qualquer linha com texto aparece, sem coluna ATIVO)
+  const textos=rows.map(r=>r[0]).filter(Boolean);
   if(!textos.length)return;
   const el=document.getElementById('ticker-text');
   el.textContent=[...textos,...textos].join('   •   ');
