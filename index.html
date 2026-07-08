@@ -660,7 +660,7 @@ async function carregarAvisos(){
    TICKER
    ========================================================= */
 async function carregarTicker(){
-  const rows=await fetchCSV(GID_TICKER);
+  const rows=await fetchCSV(GID_TICKER,3);
   // Planilha: A=Texto, B=ATIVO(SIM/NÃO)
   const textos=rows.filter(r=>{
     if(!r[0])return false;
