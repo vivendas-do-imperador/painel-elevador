@@ -567,8 +567,13 @@ async function fetchCSV(gid,skip=5){
 /* =========================================================
    CONTROLE REMOTO
    Linha 4 (primeira linha de dados) — comando imediato:
-     Col A = parar | video | playlist | off | ligar
-     Col B = valor do comando (URL do vídeo, se aplicável)
+     Col A = parar | video | playlist | off | ligar | aviso | ticker | reload
+     Col B = valor do comando:
+       video   → URL do vídeo (YouTube ou Drive)
+       aviso   → texto do aviso urgente (aparece na hora, some sozinho)
+       ticker  → texto urgente do rodapé (aparece na hora, some sozinho)
+       reload  → "sim" força o painel a recarregar a página
+       off/ligar/parar/playlist → não usam a coluna B (playlist usa a lista abaixo)
    Qualquer linha — agenda de programação por horário:
      Col C = Hora Início (HH:MM)   Col D = Hora Fim (HH:MM)
      Col E = Tipo (video | foto | slide)
@@ -607,6 +612,19 @@ async function verificarControle(){
           else if(acao==='playlist'){
             playlist=rows.map(r=>(r[1]||'').trim()).filter(Boolean);
             if(playlist.length){modoPlaylist=true;playlistIndex=0;_tocarPlaylistItem(playlist[0]);}
+          }
+          else if(acao==='aviso'&&valor){
+            mostrarAviso({titulo:'Aviso Urgente',texto:valor,icone:'🚨',tag:'Urgente'});
+          }
+          else if(acao==='ticker'&&valor){
+            tickerUrgente(valor);
+          }
+          else if(acao==='reload'&&valor){
+            const chaveReload='reload_'+valor;
+            if(sessionStorage.getItem('ultimoReloadVivendas')!==chaveReload){
+              sessionStorage.setItem('ultimoReloadVivendas',chaveReload);
+              window.location.reload(true);
+            }
           }
         }
       }
@@ -796,6 +814,15 @@ async function carregarTicker(){
   el.textContent=[...textos,...textos].join('   •   ');
   el.style.animation='none';el.offsetHeight;
   el.style.animation='ticker '+Math.max(90,textos.join('').length*0.45)+'s linear infinite';
+}
+const TEMPO_TICKER_URGENTE=60000;
+function tickerUrgente(texto){
+  const el=document.getElementById('ticker-text');
+  el.textContent='🚨 '+texto;
+  el.style.animation='none';el.offsetHeight;
+  el.style.animation='ticker '+Math.max(30,texto.length*0.45)+'s linear infinite';
+  clearTimeout(window._tickerUrgenteTimer);
+  window._tickerUrgenteTimer=setTimeout(carregarTicker,TEMPO_TICKER_URGENTE);
 }
 
 /* =========================================================
