@@ -792,8 +792,8 @@ async function carregarAvisos(){
    ========================================================= */
 async function carregarTicker(){
   const rows=linhas('TICKER');
-  // Planilha: A=Texto (qualquer linha com texto aparece, sem coluna ATIVO)
-  const textos=rows.map(r=>r[0]).filter(Boolean);
+  // Planilha: texto pode estar na coluna A ou B (aceita qualquer uma)
+  const textos=rows.map(r=>r[0]||r[1]).filter(Boolean);
   if(!textos.length)return;
   const el=document.getElementById('ticker-text');
   el.textContent=[...textos,...textos].join('   •   ');
