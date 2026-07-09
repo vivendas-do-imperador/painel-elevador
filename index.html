@@ -221,9 +221,8 @@ html,body{width:100vw;height:100vh;overflow:hidden;background:var(--azul2);color
 /* =========================================================
    CONFIGURAÇÕES — PLANILHA VIVENDAS DO IMPERADOR
    ========================================================= */
-const CSV_BASE='https://docs.google.com/spreadsheets/d/e/2PACX-1vR7LIajehR7ILfrKuQvQBuwIT7c70FbSrm0FSJ9CXRiSlnawZJzSdCd73QpYpVWeuBDfIVFRNNvDqKN/pub?output=csv';
-const GID_AVISOS='1009110074',GID_TICKER='798329129',GID_FRASES='438009640';
-const GID_REGRAS='1276705012',GID_CONTROLE='1273927625';
+// Cole aqui o link do Apps Script publicado (termina em /exec)
+const WEBAPP_URL='https://script.google.com/macros/s/AKfycbwVSS7NSuQhX2ULlZFGYoEdV9RqnCnAa-9PQJb42EDZRLJAztANRtgSw-yS1YcX3Nn6xw/exec';
 
 const SYNC_INTERVAL=5*60*1000,TEMPO_AVISO=10000;
 const CLIMA_LAT=-22.9039,CLIMA_LON=-43.4205;
@@ -542,27 +541,19 @@ async function verificarFeriado(){
 /* =========================================================
    CSV PARSER (Planilha Vivendas)
    ========================================================= */
-async function fetchCSV(gid,skip=5){
+let DADOS_CACHE=null;
+async function carregarDados(){
   try{
-    const cb='&_cb='+Date.now();
-    const url=CSV_BASE+'&gid='+gid+'&single=true'+cb;let text=null;
-    try{const r=await fetch(url,{redirect:'follow',cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}
-    if(!text){try{const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url)+cb,{cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}}
-    if(!text){try{const r=await fetch('https://corsproxy.io/?'+encodeURIComponent(url)+cb,{cache:'no-store'});if(r.ok)text=await r.text();}catch(e){}}
-    if(!text)return[];
-    const lines=text.split(/\r?\n/).filter(l=>l.trim());
-    if(lines.length<2)return[];
-    return lines.slice(skip).map(line=>{
-      const cols=[];let cur='',inQ=false;
-      for(let i=0;i<line.length;i++){
-        const c=line[i];
-        if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
-        else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
-        else cur+=c;
-      }
-      cols.push(cur.trim());return cols;
-    });
-  }catch(e){return[];}
+    const r=await fetch(WEBAPP_URL+'?_cb='+Date.now(),{cache:'no-store'});
+    if(r.ok)DADOS_CACHE=await r.json();
+  }catch(e){}
+  return DADOS_CACHE||{};
+}
+// Retorna as linhas de dados de uma aba, já sem as 3 linhas de cabeçalho
+function linhas(aba){
+  const d=DADOS_CACHE||{};
+  const rows=d[aba]||[];
+  return rows.slice(3).map(r=>r.map(c=>(c==null?'':String(c).trim())));
 }
 
 /* =========================================================
@@ -581,7 +572,8 @@ async function fetchCSV(gid,skip=5){
      Col F = Link (para "slide", vários links separados por vírgula)
    ========================================================= */
 async function verificarControle(){
-  const rows=await fetchCSV(GID_CONTROLE,3);
+  await carregarDados();
+  const rows=linhas('CONTROLE');
   if(!rows.length)return;
   const linha=rows[0];
   if(linha&&linha[0]){
@@ -657,9 +649,13 @@ function ligarTela(){
    PROGRAMAÇÃO POR HORÁRIO — vídeos/fotos/slides do Drive
    ========================================================= */
 function paraMinutos(hhmm){
-  const m=(hhmm||'').trim().match(/^(\d{1,2}):(\d{2})$/);
+  const s=(hhmm||'').trim();
+  const m=s.match(/^(\d{1,2}):(\d{2})/);
   if(!m)return null;
-  return parseInt(m[1],10)*60+parseInt(m[2],10);
+  let h=parseInt(m[1],10),mi=parseInt(m[2],10);
+  if(/pm/i.test(s)&&h<12)h+=12;
+  if(/am/i.test(s)&&h===12)h=0;
+  return h*60+mi;
 }
 function verificarProgramacao(rows){
   if(modoDesligado)return;
@@ -761,14 +757,10 @@ function mostrarAviso(a){
 function agendarProx(ms){clearTimeout(avisoTimer);avisoTimer=setTimeout(()=>{avisoIdx=(avisoIdx+1)%avisos.length;mostrarAviso(avisos[avisoIdx]);},ms);}
 
 async function carregarAvisos(){
-  const rows=await fetchCSV(GID_AVISOS);
+  const rows=linhas('AVISOS');
   const listaAvisos=[];
-  // Planilha: A=Título, B=Texto, C=Ícone(emoji), D=ATIVO(SIM/NÃO)
-  rows.filter(r=>{
-    if(!r[0]||r[0].startsWith('⚙'))return false;
-    const ativo=(r[3]||'').trim().toUpperCase();
-    return ativo===''||ativo==='SIM';
-  }).forEach(r=>{
+  // Planilha: A=Título, B=Texto, C=Ícone(emoji) — qualquer linha com título aparece
+  rows.filter(r=>r[0]&&!r[0].startsWith('⚙')).forEach(r=>{
     const titulo=(r[0]||'').trim();
     const texto=(r[1]||'').trim();
     const icone=(r[2]||'📌').trim()||'📌';
@@ -777,13 +769,9 @@ async function carregarAvisos(){
   if(!listaAvisos.length) listaAvisos.push({titulo:'Bem-vindo!',texto:'Painel de Comunicação do Condomínio Vivendas do Imperador.',icone:'👋',tag:'Aviso'});
 
   // Carregar regras para intercalar
-  const rowsR=await fetchCSV(GID_REGRAS);
+  const rowsR=linhas('REGRAS');
   const listaRegras=[];
-  rowsR.filter(r=>{
-    if(!r[0]||r[0].startsWith('⚙'))return false;
-    const ativo=(r[3]||'').trim().toUpperCase();
-    return ativo===''||ativo==='SIM';
-  }).forEach(r=>{
+  rowsR.filter(r=>r[0]&&!r[0].startsWith('⚙')).forEach(r=>{
     listaRegras.push({titulo:(r[0]||'').trim(),texto:(r[1]||'').trim(),icone:(r[2]||'📋').trim()||'📋',tag:'Regras & Normas'});
   });
 
@@ -803,7 +791,7 @@ async function carregarAvisos(){
    TICKER
    ========================================================= */
 async function carregarTicker(){
-  const rows=await fetchCSV(GID_TICKER,3);
+  const rows=linhas('TICKER');
   // Planilha: A=Texto (qualquer linha com texto aparece, sem coluna ATIVO)
   const textos=rows.map(r=>r[0]).filter(Boolean);
   if(!textos.length)return;
@@ -849,13 +837,9 @@ function proximaFrase(lista){
 
 async function carregarFrase(){
   clearTimeout(fraseTimer);
-  const rows=await fetchCSV(GID_FRASES);
-  // Planilha: A=Frase, B=Autor(opcional), C=ATIVO(SIM/NÃO)
-  const filtradas=rows.filter(r=>{
-    if(!r[0])return false;
-    const ativo=(r[2]||'').trim().toUpperCase();
-    return ativo===''||ativo==='SIM';
-  });
+  const rows=linhas('FRASES');
+  // Planilha: A=Frase, B=Autor(opcional) — qualquer linha com frase aparece
+  const filtradas=rows.filter(r=>r[0]);
   const lista=filtradas.length?filtradas:FRASES_FALLBACK;
   fraseIdx=Math.floor(Date.now()/(1000*60*60*24))%lista.length;
   mostrarFrase(lista[fraseIdx]);
@@ -942,6 +926,7 @@ function _tocarPlaylistItem(url){
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
 async function sincronizar(){
+  await carregarDados();
   await carregarAvisos();await sleep(1000);
   await carregarTicker();await sleep(1000);
   await carregarFrase();await sleep(1000);
