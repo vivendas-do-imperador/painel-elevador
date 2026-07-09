@@ -870,7 +870,7 @@ function isYoutube(url){return url.includes('youtube.com')||url.includes('youtu.
 function abrirYoutubeExterno(url){
   if(typeof fully!=='undefined'){
     try{
-      const playerUrl='https://vivendas-do-imperador.github.io/painel-tv/yt-player.html?url='+encodeURIComponent(url);
+      const playerUrl=window.location.origin+window.location.pathname.replace(/[^/]*$/,'')+'yt-player.html?url='+encodeURIComponent(url);
       fully.loadURL(playerUrl);
       videoAtivo=true;
       setStatus('YouTube tocando',true);
@@ -982,7 +982,7 @@ function agendarReloadVivendas(){
   function executarReload(){
     const agora = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
     setReloadStatus('⟳ verificando... ' + agora, 'rgba(255,193,7,0.8)');
-    const url = 'https://vivendas-do-imperador.github.io/painel-tv/?nocache='+Date.now();
+    const url = window.location.origin + window.location.pathname + '?nocache='+Date.now();
     fetch(url, {cache:'no-store'})
       .then(r => r.text())
       .then(html => {
