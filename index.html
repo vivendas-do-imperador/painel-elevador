@@ -575,7 +575,8 @@ async function verificarControle(){
   await carregarDados();
   const rows=linhas('CONTROLE');
   if(!rows.length)return;
-  const linha=rows[0];
+  const COMANDOS_VALIDOS=['off','ligar','parar','video','playlist','aviso','ticker','reload'];
+  const linha=rows.find(r=>r[0]&&COMANDOS_VALIDOS.includes(r[0].trim().toLowerCase()));
   if(linha&&linha[0]){
     const acao=linha[0].trim().toLowerCase();
     const valor=(linha[1]||'').trim();
